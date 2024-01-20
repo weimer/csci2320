@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CSCI 2320 &mdash; Principles of Programming Languages</title>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+   <link href="css/starter-template.css" rel="stylesheet">
+</head> 
+
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" class="active" href="index.html">Principles of Programming Languages</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <!-- <li class="active"><a href="#">Home</a></li> --> 
+            <li><a href="lectures.html">Lectures</a></li>
+            <li class="dropdown active">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">Assignments <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="pa1.html">PA1 &mdash; Rosetta</a></li> 
+                  <li><a href="pa2.html">PA2 &mdash; Lexer</a></li> 
+                  <li><a href="pa3.html">PA3 &mdash; Parser</a></li> 
+                  <li><a href="pa4.html">PA4 &mdash; Semantic Analyzer</a></li> 
+                  <li><a href="pa5.html">PA5 &mdash; Interpreter</a></li> 
+                  <li class="divider"></li>
+                  <li><a href="https://autograder.io/web/course/262">Project Submission</a></li> 
+                </ul>
+            </li> 
+            <li><a href="exams.html">Exams</a></li>
+            <li><a href="cool.html">Cool</a></li>
+            <li><a href="https://piazza.com/bowdoin/spring2024/csci2320">Forum</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container">
+<div class="starter-template">
+
+<h1>PA4 &mdash; The Semantic Analyzer</h1> 
+
+<p>
+You may complete this assignment in OCaml, Python, JavaScript, Haskell or Ruby.
+</p> 
+<p>
+You may work in a team of two people for this assignment. You may work in a
+team for any or all subsequent programming assignments. You do not need to
+keep the same teammate. The course staff are not responsible for finding
+you a willing teammate. 
+</p> 
+
+<h1>Goal</h1> 
+
+<p> 
+For this assignment you will write a <i>semantic analyzer</i>. Among other
+things, this involves traversing the abstract syntax tree and the class
+hierarchy. You will reject all Cool programs that do not comply with the
+Cool type system. 
+</p> 
+<p> 
+You will also write additional code to unserialize the AST produced by
+the parser stage and to serialize the class map, implementation map,
+parent map, and annotated AST produced by your semantic analysis. 
+</p> 
+
+<h1>Specification</h1> 
+
+<p> 
+You must create three artifacts: 
+<ol>
+
+<li> A program that takes a single command-line argument (e.g.,
+<tt><i>file</i>.cl-ast</tt>). That argument will be an ASCII text 
+Cool <i>abstract syntax tree</i> file (as described in PA3).
+Your program must either indicate that there is an error in the
+input (e.g., a type error) or emit <tt><i>file</i>.cl-type</tt>, a
+serialized Cool
+abstract syntax tree, class map, implementation map, and parent map. 
+If your program is called <tt>checker</tt>, invoking <tt>checker
+<i>file</i>.cl-ast</tt> should yield the same output as <tt>cool --type
+<i>file</i>.cl</tt>. Your program will consist of a number of OCaml files, a
+number of Python files, a number of JavaScript files, a number of
+Haskell files, or a number of Ruby files. 
+
+<li> A plain ASCII text file called <tt>readme.txt</tt> describing your
+design decisions and choice of test cases. See the grading rubric. A few
+paragraphs should suffice. 
+
+<li> Testcases <tt>good.cl</tt>, <tt>bad1.cl</tt>, <tt>bad2.cl</tt> and
+<tt>bad3.cl</tt>. The first should pass the semantic analysis stage. The
+remaining three should yield semantic analysis errors. 
+
+</ol>
+
+<h1>Error Reporting</h1> 
+
+<p>
+To report an error, write the string 
+</p> 
+<div class="panel panel-danger">
+<div class="panel-body">
+<tt>ERROR: <i>line_number</i>: Type-Check: <i>message</i></tt> 
+</div></div>
+<p> 
+to standard output and terminate the
+program. You may
+write whatever you want in the message, but it should be fairly indicative. 
+Example erroneous input:
+</p> 
+<div class="panel panel-primary"><div class="panel-body">
+class Main inherits IO { <br>
+ &nbsp;main() : Object { <br>
+ &nbsp; &nbsp;out_string("Hello, world.\n" + 16777216) -- adding string + int !? <br>
+ &nbsp;} ; <br>
+} ;
+</div></div> 
+<p> 
+Example error report output: 
+</p> 
+<div class="panel panel-danger">
+<div class="panel-body">
+ERROR: 3: Type-Check: arithmetic on String Int instead of Ints
+</div></div> 
+
+
+<h1>Line Number Error Reporting</h1> 
+
+<p>
+The typing rules do not directly specify the line numbers on which errors
+are to be reported. The Cool reference compiler uses these
+guidelines (possibly surprising ones are <i>italicized</i>):
+</p> 
+<ul>
+  <li> Errors related to parameter-less method <tt>main</tt> in class
+  <tt>Main</tt>: always line 0 
+  <li> Inheritance cycle: always line 0 
+  <li> Other inheritance type problem: inherited type identifier location 
+  <li> <tt>self</tt> or <tt>SELF_TYPE</tt> used in wrong place: self
+    (resp. SELF_TYPE) identifier (resp. type) location 
+  <li> Redefining a feature: (second) feature location
+  <li> Redefining a formal or class: (second) identifier location 
+  <li> Other attribute problems: attribute location 
+  <li> Redefining a method and changing types: (second) type location 
+  <li> Other problems with redefining a method: method location 
+  <li> Method body type does not conform: method <i>name</i> identifier
+    location 
+  <li> Attribute initializer does not conform: attribute <i>name</i>
+  identifier location 
+
+  <p> 
+
+  <li> Errors with types of arguments to relational/arithmetic operations:
+  location of relational/arithmetic operation expression 
+  <li> Errors with types of <tt>while</tt> / <tt>if</tt> subexpression(s):
+  location of (enclosing) <tt>while</tt> or <tt>if</tt> expression
+  (<i>not</i> the location of the conditional expression)
+  <li> Errors with <tt>case</tt> expression (e.g., lub): location of
+  <tt>case</tt> expression 
+  <li> Errors with conformance in <tt>let</tt>: location of <tt>let</tt>
+  expression (<i>not</i> location of initializer) 
+  <li> Errors in blocks: location of (beginning of) block expression 
+  <li> Errors in actual arguments: location of method invocation expression
+  (<i>not</i> the location of any particular actual argument)
+  <li> Assignment does not conform: assignment expression location
+  (<i>not</i> right-hand-side location) 
+  <li> Unknown identifier: location of identifier
+  <li> Unknown method: location of method name identifier 
+  <li> Unknown type: location of type 
+
+</ul>
+
+<p> 
+Remember that you do not have to match the English prose of the reference
+compiler's error messages at all. You just have to get the line number
+right. 
+</p> 
+<p>
+Semantic checks are <i>unordered</i> &mdash; if a program contains two
+or more errors, you may indicate whichever you like. (All of our test cases
+for grading will contain at most one error so this will not be an issue.) 
+</p> 
+
+
+<h1>The .cl-type File Format</h1> 
+
+<p> 
+If there are no errors in <tt><i>file</i>.cl-ast</tt> your program should
+create <tt><i>file</i>.cl-type</tt> and serialize the 
+class map, implementation map, parent map, and annotated AST to it. 
+</p> 
+<p> 
+The class
+and implementation maps are described in the Cool Reference Manual. 
+</p> 
+<p> 
+A <tt>.cl-type</tt> file consists of four sections:
+</p> 
+  <ol>
+  <li> The class map.
+  <li> The implementation map.
+  <li> The parent map.
+  <li> The annotated AST. 
+  </ol>
+<p> 
+Simply output the four sections in order, one after the other.  
+</p> 
+<p> 
+We will now describe exactly what to output for the class and
+implementation maps.  The general idea and notation (one string per line,
+recursive descent) are the same as in PA3. 
+</p> 
+<ul> 
+<li> <b>The Class Map</b> 
+  <ul>
+  <li> Output <tt>class_map</tt> \n. 
+  <li> Output the number of classes and then \n. 
+  <li> Output each class in turn (in ascending alphabetical order): 
+    <ul>
+      <li> Output the name of the class and then \n. 
+      <li> Output the number of attributes and then \n.
+      <li> Output each attribute in turn (in order of appearance, with
+      inherited attributes from a superclass coming first): 
+      <ul>
+        <li> Output <tt>no_initializer</tt> \n and then the attribute name
+        \n and then the type name \n. 
+        <li> <b><i>or</i></b> Output <tt>initializer</tt> \n and then the
+        attribute name \n and then the type name \n and then the
+        initializer expression. 
+      </ul> 
+    </ul>
+  </ul> 
+<li> <b>The Implementation Map</b>
+  <ul>
+  <li> Output <tt>implementation_map</tt> \n.
+  <li> Output the number of classes and then \n.  
+  <li> Output each class in turn (in ascending alphabetical order): 
+    <ul>
+      <li> Output the name of the class and then \n. 
+      <li> Output the number of methods for that class and then \n.
+      <li> Output each method in turn (in order of appearance, with
+      inherited or overridden methods from a superclass coming first;
+      internal methods are defined to appear in ascending alphabetical order): 
+        <ul>
+          <li> Output the method name and then \n.
+          <li> Output the number of formals and then \n.
+          <li> Output each formal's name only:
+            <ul>
+              <li> Output the name and then \n
+            </ul>
+          <li> If this method is inherited from a parent class and not
+          overriden, output the name of the ultimate parent class that 
+          defined the method body expression and then \n. Otherwise, output
+          the name of the current class and then \n.
+          <li> Output the method body expression. 
+        </ul> 
+    </ul> 
+  </ul> 
+<li> <b>The Parent Map</b>
+  <ul>
+    <li> Output <tt>parent_map</tt> \n.
+    <li> Output the number of parent-child inheritance relations and then
+    \n. This number is equal to the number of classes minus one (since
+    <tt>Object</tt> has no parent).
+    <li> Output each child class in turn (in ascending
+    alphabetical order): 
+      <ul>
+        <li> Output the name of the child class and then \n. 
+        <li> Output the name of the child class's parent and then \n. 
+      </ul> 
+  </ul> 
+
+<li> <b>The Annotated AST</b> 
+  <ul>
+  <li> With two exceptions, the annotated AST format is 
+  identical to the normal AST from PA3. 
+  <li> The first change involves expressions. To output an
+  <b>Expression</b>:
+    <ol>
+    <li> Output the line number of the expression and then a newline (as in
+    PA3).
+    <li> <text class=text-warning>Output the name of type associated with the
+    expression and then a newline.</text> 
+    For example, the expression <tt>3+x</tt> is associated with the type
+    <tt>Int</tt>. 
+    This is new to PA4. It should be done for PA4, but not for PA4<b>c</b>. 
+    <li> Output the name of the expression and then a newline and then any
+    subparts (as in PA3).
+    </ol>
+  <li> The second change is a new kind of expression, <i>internal</i>, 
+  used to represent the bodies of predefined methods.  Internal expressions
+  are those that are handled by the run-time system &mdash; you might think of
+  them as part of the standard library. You output <b>Internal
+  Expressions</b> (including the type annotation, as above) as follows: 
+  <ul>
+    <li> 
+    <text class=text-warning>0 \n <i>type</i> \n <tt>internal</tt> \n Class.method \n </text>
+  </ul>
+  The valid kinds of internal expressions (i.e., the values for
+  Class.method) are:
+  <ul>
+    <li> 
+    IO.in_int 
+    IO.in_string 
+    IO.out_int 
+    IO.out_string
+    Object.abort 
+    Object.copy 
+    Object.type_name 
+    String.concat 
+    String.length
+    String.substr
+  </ul>
+  They are formally defined in the Cool Reference Manual.  
+
+  <p>
+  <i>Note that you must output
+  information about all classes and methods defined in the program as well
+  as all base classes (and their methods).  Do not just print out "classes
+  actually used" or "methods actually called" or something like that.
+  Output all classes and methods &mdash; no optimizations or shortcuts!</i> 
+  <p> 
+
+</ul> 
+</ul> 
+
+<h1>Detailed .cl-type Example</h1> 
+
+<p>
+Now that we've formally defined the output specification, we can
+present a worked example. Here's the example input we will consider: 
+</p> 
+<div class="panel panel-primary"><div class="panel-body">
+class Main inherits IO {<br>
+&nbsp; my_attribute : Int <- 5 ; <br>
+&nbsp; main() : Object { <br>
+&nbsp; &nbsp; out_string("Hello, world.\n") <br>
+&nbsp; } ;<br>
+} ; 
+</div></div> 
+<p> 
+Resulting <tt>.cl-type</tt> class map output <i>with comments</i>: 
+</p> 
+<p> 
+<tt>
+<table class="table table-hover">
+<thead>
+  <tr>
+  <th> .cl-type class map</th>
+  <th> comment </th> 
+  </tr> 
+</thead>
+<tbody>
+<tr> <td>  class_map  <td> </tr> 
+<tr> <td>  6  <td> number of classes  </tr> 
+<tr> <td>  Bool  <td> note: includes predefined base
+classes  </tr> 
+<tr> <td>  0  <td> </tr> 
+<tr> <td>  IO  <td> </tr> 
+<tr> <td>  0  <td> </tr> 
+<tr> <td>  Int  <td> </tr> 
+<tr> <td>  0  <td> </tr> 
+<tr> <td>  Main  <td> </tr> 
+<tr> <td>  1  <td> our Main has 1 attribute  </tr> 
+<tr> <td>  initializer  <td> </tr> 
+<tr> <td>  my_attribute  <td> named "my_attribute"  </tr> 
+<tr> <td>  Int  <td> with type Int  </tr> 
+<tr class="info"> <td>  2  <td> initializer expression line number
+</tr> 
+<tr class="info"> <td>  Int  <td> initializer expression type (see
+above: this is an expression <i>annotated</i> with a type) 
+<br> -- do <b>not</b> emit these <i>expression</i> type annotations for the PA4c Checkpoint! </tr> 
+<tr class="info"> <td>  integer  <td> initializer expression kind  </tr> 
+<tr class="info"> <td>  5  <td> which integer constant is it? </tr> 
+<tr> <td> Object  <td> </tr> 
+<tr> <td> 0  <td> </tr> 
+<tr> <td> String  <td> </tr> 
+<tr> <td> 0  <td> </tr> 
+</tbody> 
+</table> 
+</tt>
+
+<p> 
+Resulting <tt>.cl-type</tt> implementation map output <i>with
+comments</i>: 
+<p>
+<tt>
+<table class="table table-hover">
+<thead>
+  <tr>
+  <th> .cl-type implementation map</th>
+  <th> comment </th> 
+  </tr> 
+</thead>
+<tbody>
+<tr> <td>  implementation_map <td>  </tr> 
+<tr> <td>  6 <td> six classes </tr> 
+<tr> <td>  Bool <td> first is Bool </tr> 
+<tr> <td>  3 <td> - it has three methods </tr> 
+<tr> <td>  abort <td> - first is abort() </tr> 
+<tr> <td>  0 <td> -- abort has 0 formal arguments </tr> 
+<tr> <td>  Object <td> -- name of parent class from
+which Bool inherits abort()  </tr> 
+<tr class="info"> <td>  0 <td> -- abort's body expression starts
+on line 0  </tr> 
+<tr class="info"> <td>  Object <td> -- abort's body expression
+has type Object </tr> 
+<tr class="info"> <td>  internal <td> -- abort's body is
+an internal kind of expression (i.e., a system call; see above) </tr> 
+<tr class="info"> <td>  Object.abort <td> -- extra detail on
+abort's body expression  </tr> 
+<tr> <td>  copy <td> - second of Bool's three
+methods is copy() </tr> 
+<tr> <td>  0 <td> -- copy has 0 formal arguments </tr> 
+<tr> <td>  Object <td> -- name of parent class from
+which Bool inherits copy()  </tr> 
+<tr class="info"> <td>  0 <td> -- copy's body expression starts
+on line 0  </tr> 
+<tr class="info"> <td>  SELF_TYPE <td> -- copy's body
+expression has type SELF_TYPE </tr> 
+<tr class="info"> <td>  internal <td> -- copy's body is
+an internal kind of expression (i.e., a system call; see above) </tr> 
+<tr class="info"> <td>  Object.copy <td> -- extra detail on
+copy's body expression  </tr> 
+<tr class="warning"> <td>  ... many lines skipped ... <td>  </tr> 
+<tr> <td>  Main <td> another class is Main </tr> 
+<tr> <td>  8 <td> - it has 8 methods  </tr> 
+<tr class="warning"> <td>  ... many lines skipped ... <td>   </tr> 
+<tr> <td>  main <td> - one of Main's methods is
+main() </tr> 
+<tr> <td>  0 <td> -- main has 0 formal arguments </tr> 
+<tr> <td>  Main <td> -- the name of the class where
+Main.main() is defined  </tr> 
+<tr class="info"> <td>  4 <td> -- the body expression of Main.main starts on line 4  </tr> 
+<tr class="info"> <td>  SELF_TYPE <td> -- the body expression
+of Main.main has type SELF_TYPE </tr> 
+<tr class="info"> <td>  self_dispatch <td> -- the body
+of Main.main() is a self_dispatch kind of expression </tr> 
+<tr class="warning"> <td>  ... many lines skipped ... <td>   </tr> 
+</tbody> 
+</table>
+</tt> 
+
+<p>
+Finally, the resulting
+<tt>.cl-type</tt> parent map output <i>with
+comments</i>: 
+</p> 
+
+<table class="table table-hover">
+<thead>
+  <tr>
+  <th> .cl-type parent map</th>
+  <th> comment </th> 
+  </tr> 
+</thead>
+<tbody>
+<tr> <td>  parent_map </font><td> </tr>
+<tr> <td>  5 </font><td> there are five classes with
+parents (Object is the sixth class)</tr>
+<tr> <td>  Bool </font><td> Bool's parent ...</tr>
+<tr> <td>  Object </font><td> ... is Object.</tr>
+<tr> <td>  IO </font><td>  IO's parent ...</tr>
+<tr> <td>  Object </font><td> ... is Object.</tr>
+<tr> <td>  Int </font><td> Int's parent ...</tr>
+<tr> <td>  Object </font><td> ... is Object.</tr>
+<tr> <td>  Main </font><td> Main's parent ...</tr>
+<tr> <td>  IO </font><td> ... is IO.</tr>
+<tr> <td>  String </font><td> String's parent ...</tr>
+<tr> <td>  Object </font><td> ... is Object.</tr>
+</tbody> 
+</table>
+<p> 
+Writing the rote code to output a <tt>.cl-type</tt> text file given an AST 
+may take a bit of time but it should not be difficult; our reference
+implementation does it in 35 lines and cleaves closely to the structure
+given above. Reading in the AST is similarly straightforward; our reference
+implementation does it in 171 lines. 
+</p> 
+
+<h1>Commentary</h1> 
+
+<p>
+You can do basic testing as follows: 
+</p> 
+<div class="panel panel-primary"><div class="panel-body">
+$ cool --parse file.cl   <br>
+$ cool --out reference --type file.cl  <br>
+$ my-checker file.cl-ast <br>
+$ diff -b -B -E -w file.cl-type reference.cl-type  
+</div></div>
+<p> 
+You should implement all of the typing rules in the Cool Reference Manual.
+There are also a number of other rules and corner cases you have to check
+(e.g., no class can inherit from Int, you cannot redefine a class, you
+cannot have an attribute named self, etc.). They are sprinkled throughout
+the manual. Check everything you possibly can. 
+</p> 
+
+<h1>PA4t &mdash; Creating PA4 Tests</h1> 
+
+<p>
+PA4t is a <b>preliminary testing exercise</b> that introduces a form of 
+<A href="http://en.wikipedia.org/wiki/Test-driven_development">test-driven
+development</a> or 
+<a href="http://en.wikipedia.org/wiki/Mutation_testing">mutation
+testing</a> into our software development process and requires you to
+construct a high-quality test suite. 
+</p> 
+<p>
+The goal of PA4t is to leave you with a high-quality test suite of Cool
+programs that you can use to evaluate your own PA4 type checker. Writing
+a type checker requires you to consider many corner cases when reading the
+formal and informal typing rules in the Cool Reference Manual. While you 
+you can check for correct "positive" behavior by comparing your
+typechecker's output to the reference compiler's output on existing "good"
+Cool programs, it is comparatively harder to check for "negative" behavior
+(i.e., correctly reporting ill-typed Cool programs). 
+</p> 
+<p>
+If you fail to construct a rich test suite of syntactically-valid but
+semantically-invalid programs you will face a frustrating series of "you
+fail held-out negative test <i>x</i>" reports for PA4 proper, which can
+turn into unproductive guessing games. Because students often report that
+this is frustrating (even though it is, shall we say, infinitely more
+realistic than making all of the post-deployment tests visible in advance),
+the PA4t preliminary testing exercise provides a structured means to help
+you get started with the construction of a rich test suite. 
+</p> 
+<p> 
+The course staff have produced 20 variants of the reference compiler, each
+with a secret <a
+href="http://en.wikipedia.org/wiki/Fault_injection">intentionally-introduced 
+defect</a> related to type-checking. A high-quality test suite
+is one that <i>reveals</i> each introduced defect by showing a difference
+between the behavior of the true reference compiler and the corresponding
+buggy version. You desire a high-quality test suite to help you gain
+confidence in your own PA4 submission.
+</p> 
+<p> 
+For PA4t, you must produce syntactically valid Cool programs (test cases). 
+There are 20 separate held-out seeded type-checker bugs waiting on the
+grading server. For each bug, if one of your tests causes the reference 
+and the buggy version to produce difference output (that is, either a
+different <tt>.cl-type</tt> file or a different error report), you win:
+that test has revealed that bug. For full credit your tests must reveal at
+least 15 of the 20 unknown defects. 
+</p> 
+<p>
+The secret defects that we have injected into the reference compiler
+correspond to common defects made by students in PA4. Thus, if you make a
+rich test suite for PA4t that reveals many defects, you can use it on your
+own PA4 submission to reveal and fix your own bugs! 
+</p> 
+
+<h1>Video Guides</h1> 
+
+<p>
+A number of Video Guides are provided to help you get started on this
+assignment on your own. The Video Guides are walkthroughs in which the
+instructor manually completes and narrates, in real time, the
+first part of this assignment &mdash; including a submission to the
+grading server. They include coding, testing and debugging elements.
+</p> 
+<p>
+If you are still stuck, you can post on the forum
+or approach the professor. The use of online
+instructional content outside of class weakly approximates a 
+<a href="https://en.wikipedia.org/wiki/Flipped_classroom">flipped classroom
+model</a>. Click on a video guide to begin, at which point you can watch
+it fullscreen or via Youtube if desired.
+</p> 
+<p>
+<div class="row">
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/2CMhLddBt1M"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>PA4<b>t</b> &mdash; Test Cases</center>
+  </div> 
+
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/Wa9zMygcv_M"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>PA4<b>c</b> &mdash; Checkpoint</center>
+  </div> 
+
+</div> 
+
+<div class="row">
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/Oxpgrkmsxhg"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>PA4 &mdash; Expressions</center>
+  </div> 
+</div> 
+</p> 
+
+<h1>What to Turn In For PA4t</h1> 
+<p> 
+For PA4t you should turn in (electronically): 
+</p> 
+<ul>
+  <li> A set of up to 99 <tt>.cl</tt> files: Cool
+  typechecker testcases. 
+    <ul>
+    <li> Each testcase you submit must be syntactically valid (i.e., must
+    pass <tt>cool --parse</tt>).
+    <li> Each testcase you submit may be semantically valid or semantically
+    invalid, your choice (i.e., it can pass or fail <tt>cool --type</tt>). 
+    <li> No testcase should be named <tt>bug...</tt> or <tt>ref...</tt>
+    because the testing server uses those prefices internally. If you
+    submit a test case with such a name it will be ignored. (Limited course
+    resources can either be spent making better lectures, grading your
+    assignments, etc., or ironing out wrinkles such as these from grading
+    scripts. We have chosen to focus on pedagogy.) 
+    <li> If you submit more than 99 tests, some will be ignored. 
+    </ul> 
+</ul> 
+<p>
+Hint: because you can find "positive" bugs in your typechecker more easily
+(e.g., by running your typechecker on the correct Cool programs from
+<tt>cool-examples.zip</tt>), the PA4t exercise is strongly biased toward
+"negative" bugs (i.e., the secret buggy typecheckers usually fail to report
+certain semantic errors). 
+</p> 
+
+<h1>PA4c &mdash; Checkpoint</h1> 
+
+<p>
+PA4c is a <b>checkpoint</b> for PA4.  The typechecker is a
+large project (and a large part of your grade), so it behooves you to start
+it early. 
+</p> 
+<p> 
+For PA4c you should turn in (electronically) an early version
+of PA4 that does the following:
+</p> 
+<ul>
+  <li> Reads in the <tt>.cl-ast</tt> file given as a command-line argument. 
+    <ul>
+    <li> You do <i>not</i> need to use a parser generator to read in the
+    <tt>.cl-ast</tt> file &mdash; its format was specifically chosen to make it
+    easy to read with just some mutually-recursive procedures. It should
+    take you (much) less than 150 lines to read in the <tt>.cl-ast</tt>
+    file. 
+    </ul>
+  <li> Does every bit of typechecking and semantic analysis possible
+  <i>without typechecking expressions</i>. 
+    <ul>
+    <li> Thus you should <i>not</i> annotate types in initializer
+    expressions in the class map. 
+    </ul>
+  <li> Prints out error messages as normal.
+  <li> Outputs <i>only the class map</i> to <tt>.cl-type</tt> if there are
+  no errors. 
+    <ul>
+      <li> You can use the <tt>--class-map</tt> command-line argument to
+      get the reference compiler to spit out the class map after
+      typechecking (for comparison). 
+    </ul> 
+</ul> 
+<p>
+Thus you should build the class hierarchy and check everything related to
+that. For example:
+</p> 
+<ul>
+  <li> Check to see if a class inherits from <tt>Int</tt> (etc.). 
+  <li> Check to see if a class inherits from an undeclared class. 
+  <li> Check for cycles in the class hierarchy.  
+  <li> Check for duplicate method or attribute definitions in the same class.
+  <li> Check for a child class that redefines a parent method but changes
+  the parameters. 
+  <li> Check for a missing method <tt>main</tt> in class <tt>Main</tt>. 
+  <li> Check for <tt>self</tt> and <tt>SELF_TYPE</tt> mistakes in classes
+  and methods.  
+  <li> <i>This list is not exhaustive</i> -- read the Cool Reference Manual 
+  carefully and find everything you might check for without typechecking
+  expressions. 
+  <li> Basically, you'll look at classes, methods and attibutes (but not
+  method bodies). 
+</ul>
+
+<div class="panel panel-info">
+<div class="panel-heading">
+<h3 class="panel-title">
+Q: What's the exact list of errors I have to check for in PA4c? </h3> 
+</div>
+<div class="panel-body">
+A1: No such list is provided! Part of the assignment is thinking up all
+possible checks that do not involve expressions.<br>
+A2: Use the test cases you made for PA4t. 
+</div>
+</div>
+
+<h1>What to Turn In For PA4c</h1> 
+<p> 
+You must turn in these files: 
+</p> 
+<ol>
+  <li> <tt><i>source_files</i></tt> &mdash; your implementation, including
+    <ul>
+      <li> <i>main.rb</i> or
+      <li> <i>main.py</i> or
+      <li> <i>main.hs</i> or
+      <li> <i>main.js</i> or
+      <li> <i>main.ml</i> 
+    </ul>
+</ol> 
+
+
+<h1>What to Turn In For PA4</h1> 
+
+<p>
+You must turn in these files: 
+</p> 
+<ol>
+  <li> <tt>readme.txt</tt> &mdash; your README file 
+  <li> <tt>good.cl</tt> &mdash; a novel positive testcase
+  <li> <tt>bad1.cl</tt> &mdash; a novel negative testcase
+  <li> <tt>bad2.cl</tt> &mdash; a novel negative testcase
+  <li> <tt>bad3.cl</tt> &mdash; a novel negative testcase
+  <li> <tt><i>source_files</i></tt> &mdash; including
+    <ul>
+      <li> <i>main.rb</i> or
+      <li> <i>main.py</i> or
+      <li> <i>main.js</i> or
+      <li> <i>main.hs</i> or
+      <li> <i>main.ml</i> 
+    </ul>
+</ol> 
+
+<h1>Grading Rubric</h1>
+
+<p> 
+PA4 Grading (out of 100 points):
+</p> 
+    <ul>
+    <li> 66 points &mdash; for autograder tests 
+      <ul> 
+      <li> The scoring is directly proportional to the number of autograder
+      tests you pass. 
+      </ul> 
+    <li> 5 points &mdash; for a correct PA4<b>t</b> submission
+    <li> 5 points &mdash; for a correct PA4<b>c</b> submission
+    <li> 8 points &mdash; for a clear description in your README
+      <ul> 
+      <li> 8 &mdash; thorough discussion of design decisions (e.g., handling
+      of the class hierarchy, <tt>case</tt> and <tt>new</tt> and dispatch)
+      and choice of test cases; a few paragraphs of coherent English
+      sentences should be fine
+      <li> 4 &mdash; vague or hard to understand; omits important details
+      <li> 0 &mdash; little to no effort, or submitted an RTF/DOC/PDF file
+      instead of plain TXT 
+      </ul>
+    <li> 8 points &mdash; for valid and novel <tt>good.cl</tt>, <tt>bad1.cl</tt>,
+    <tT>bad2.cl</tt> and <tt>bad3.cl</tt> files
+      <ul> 
+      <li> 8 &mdash; wide range of test cases added, stressing most Cool features
+      and three error conditions, novel files
+      <li> 4 &mdash; added some tests, but the scope not sufficiently broad
+      <li> 0 &mdash; little to no effort, or course files resubmitted as
+      tests
+      </ul>
+    <li> 8 point &mdash; for code cleanliness
+      <ul> 
+      <li> 8 &mdash; code is mostly clean and well-commented
+      <li> 4 &mdash; code is sloppy and/or poorly commented in places
+      <li> 0 &mdash; little to no effort to organize and document code
+      </ul>
+    </ul> 
+
+</div>
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+</body>
+</html>

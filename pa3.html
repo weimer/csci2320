@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CSCI 2320 &mdash; Principles of Programming Languages</title>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+   <link href="css/starter-template.css" rel="stylesheet">
+</head> 
+
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" class="active"
+          href="index.html">Principles of Programming Languages</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <!-- <li class="active"><a href="#">Home</a></li> --> 
+            <li><a href="lectures.html">Lectures</a></li>
+            <li class="dropdown active">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">Assignments <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="pa1.html">PA1 &mdash; Rosetta</a></li> 
+                  <li><a href="pa2.html">PA2 &mdash; Lexer</a></li> 
+                  <li><a href="pa3.html">PA3 &mdash; Parser</a></li> 
+                  <li><a href="pa4.html">PA4 &mdash; Semantic Analyzer</a></li> 
+                  <li><a href="pa5.html">PA5 &mdash; Interpreter</a></li> 
+                  <li class="divider"></li>
+                  <li><a href="https://autograder.io/web/course/262">Project Submission</a></li> 
+                </ul>
+            </li> 
+            <li><a href="exams.html">Exams</a></li>
+            <li><a href="cool.html">Cool</a></li>
+            <li><a href="https://piazza.com/bowdoin/spring2024/csci2320">Forum</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container">
+<div class="starter-template">
+
+<h1>PA3 &mdash; The Parser</h1> 
+
+<p>
+You may complete this assignment in OCaml, Haskell, JavaScript, Python or
+Ruby.
+</p> 
+<p>
+You may work in a team of two people for this assignment. You may work in a
+team for any or all subsequent programming assignments. You do not need to
+keep the same teammate. The course staff are not responsible for finding
+you a willing teammate. 
+</p> 
+
+<h3>Goal</h3> 
+
+<p> 
+For this assignment you will write a <i>parser</i> using a <i>parser
+generator</i>. You will describe the Cool grammar in an
+appropriate input format and the parser generator will generate actual
+code (in OCaml, Python or Ruby). You will also write additional code to
+unserialize the tokens produced by the lexer stage and to serialize
+the abstract syntax tree produced by your parser.
+</p> 
+
+<h3>Specification</h3> 
+
+<p>
+You must create three artifacts: 
+</p> 
+<ol>
+
+<li> 
+<p>
+A program that takes a single command-line argument (e.g.,
+<tt>file.cl-lex</tt>). That argument will be an ASCII text 
+Cool <i>tokens</i> file (as described in PA2). The <tt>cl-lex</tt> file
+will always be
+well-formed (i.e., there will be no syntax errors in the <tt>cl-lex</tt>
+file <i>itself</i>). However, the <tt>cl-lex</tt> file may describe a
+sequence of Cool tokens that do not form a valid Cool program.
+</p> 
+<p> 
+Your program must either indicate that there is an error in the Cool
+program described by the <tt>cl-lex</tt> file (e.g., a parse error in the
+Cool file) or emit <tt>file.cl-ast</tt>, a serialized Cool abstract syntax
+tree. Your program's main parser component must be constructed by a parser
+generator. The "glue code" for processing command-line arguments,
+unserializing tokens and serializing the resulting abstract syntax tree
+should be written by hand.  If your program is called <tt>parser</tt>,
+invoking <tt>parser file.cl-lex</tt> should yield the same output as
+<tt>cool --parse file.cl</tt>. Your program will consist of a number of
+OCaml files, a number of Python files, or a number of Ruby files. 
+</p> 
+
+<li> A plain ASCII text file called <tt>readme.txt</tt> describing your
+design decisions and choice of test cases. See the grading rubric. A few
+paragraphs should suffice. 
+
+<li> Testcases <tt>good.cl</tt> and <tt>bad.cl</tt>. The first should
+parse correctly and yield an abstract syntax tree. The second should
+contain an error. 
+
+</ol>
+
+<div class="panel panel-warning">
+<div class="panel-body">
+You <i>must</i> use ply or racc or ocamlyacc 
+(or a similar tool or library). Do not write your entire parser by hand.
+Parts of it must be tool-generated from context-free grammar rules you provide.
+</div>
+</div>
+
+<h1>Line Numbers</h1>
+
+<p>
+The line number for an expression is the line number of the first token
+that is part of that expression. Example: 
+</p> 
+<pre>
+(* Line 5 *) while x <= 
+(* Line 6 *)        99 loop 
+(* Line 7 *)   x <- x + 1 
+(* Line 8 *) pool 
+</pre> 
+<p>
+The <tt>while</tt> expression is on line 5, the <tt>x &lt;= 99</tt>
+expression is on line 5, the <tt>99</tt> expression is on line 6, and the
+<tt>x &lt;- x + 1</tt> and <tt>x + 1</tt> expressions are on line 7. The 
+line numbers for tokens are present in the serialized token
+<tt>.cl-ast</tt> file. 
+</p> 
+
+<p> 
+Your parser is responsible for keeping track of the line numbers (both for
+the output syntax tree and for error reporting). 
+</p> 
+
+<h1>Error Reporting</h1> 
+
+<p> 
+To report an error, write the string 
+</p> 
+<div class="panel panel-danger">
+<div class="panel-body">
+<tt>ERROR: <i>line_number</i>: Parser: <i>message</i></tt> 
+</div></div> 
+<p> 
+to standard output and terminate the program. You may
+write whatever you want in the message, but it should be fairly indicative. 
+Example erroneous input:
+</p> 
+<div class="panel panel-primary"><div class="panel-body">
+(* Line 70 *) class Cons inherits List + IO { 
+</div></div> 
+<p> 
+Example error report output: 
+</p> 
+<div class="panel panel-danger">
+<div class="panel-body">
+ERROR: 70: Parser: syntax error near +
+</div></div> 
+
+<h1>The .cl-ast File Format</h1> 
+
+<p> 
+If there are no errors in <tt>file.cl-lex</tt> your program should create
+<tt>file.cl-ast</tt> and serialize the abstract syntax tree to it. The
+general format of a <tt>.cl-ast</tt> file follows
+the Cool Reference Manual Syntax
+chart. Basically, we do a 
+<a href="http://en.wikipedia.org/wiki/Tree_traversal">pre-order
+traversal</a> of the abstract syntax tree, writing down every node as we
+come to it. 
+</p> 
+<p> 
+We now describe exactly what to output for each kind of node. You can
+view this as specifying a set of mutually-recursive tree-walking functions. 
+The notation "superclass:<i>identifier</i>" means "output
+the superclass using the rule (below) for outputting an <i>identifier</i>". 
+The notation "\n" means "output a newline". 
+</p> 
+<ul>
+  <li> <b>To Output An AST.</b> A Cool AST is a list of classes. Output the
+  list of classes.
+  <li> <b>To Output A List (of classes, or features, or whatever).</b>
+  Output the number of elements, then a newline, then output each list
+  element in turn. 
+  <li> <b>To Output A Class.</b> Output the class name as an identifier.
+  Then output either: 
+    <ul> <li> <tt>no_inherits</tt> \n
+         <li> <tt>inherits</tt> \n superclass:<i>identifier</i> 
+    </ul>
+  Then output the list of features. 
+  <li> <b>To Output An Identifier.</b> Output the source-file line number,
+  then a newline, then the identifier string, then a newline.  
+  <li> <b>To Output A Feature.</b> Output the name of the feature and then
+  a newline and then any subparts, as given below:
+    <ul> <li> <tt>attribute_no_init</tt> \n name:<i>identifier</i> type:<i>identifier</i> 
+    <li> <tt>attribute_init</tt> \n name:<i>identifier</i> type:<i>identifier</i> init:<i>exp</i> 
+    <li> <tt>method</tt> \n name:<i>identifier</i> <i>formals-list</i> \n
+    type:<i>identifier</i> body:<i>exp</i> 
+    </ul>
+  <li> <b>To Output A Formal.</b> Output the name as an identifier on 
+  line and then the type as an identifier on a line. 
+  <li> <b>To Output An Expression.</b> Output the line number of the
+  expression and then a newline. Output the name of the expression
+  and then a newline and then any subparts, as given below: <ul>
+    <li> <tt>assign</tt> \n var:<i>identifier</i> rhs:<i>exp</i> 
+    <li> <tt>dynamic_dispatch</tt> \n e:<i>exp</i> method:<i>identifier</i> args:<i>exp-list</i> 
+    <li> <tt>static_dispatch</tt> \n e:<i>exp</i> type:<i>identifier</i> method:<i>identifier</i> args:<i>exp-list</i> 
+    <li> <tt>self_dispatch</tt> \n method:<i>identifier</i> args:<i>exp-list</i> 
+    <li> <tt>if</tt> \n predicate:<i>exp</i> then:<i>exp</i> else:<i>exp</i> 
+    <li> <tt>while</tt> \n predicate:<i>exp</i> body:<i>exp</i> 
+    <li> <tt>block</tt> \n body:<i>exp-list</i> 
+    <li> <tt>new</tt> \n class:<i>identifier</i> 
+    <li> <tt>isvoid</tt> \n e:<i>exp</i> 
+    <li> <tt>plus</tt> \n x:<i>exp</i> y:<i>exp</i> 
+    <li> <tt>minus</tt> \n x:<i>exp</i> y:<i>exp</i> 
+    <li> <tt>times</tt> \n x:<i>exp</i> y:<i>exp</i> 
+    <li> <tt>divide</tt> \n x:<i>exp</i> y:<i>exp</i> 
+    <li> <tt>lt</tt> \n x:<i>exp</i> y:<i>exp</i> 
+    <li> <tt>le</tt> \n x:<i>exp</i> y:<i>exp</i> 
+    <li> <tt>eq</tt> \n x:<i>exp</i> y:<i>exp</i> 
+    <li> <tt>not</tt> \n x:<i>exp</i> 
+    <li> <tt>negate</tt> \n x:<i>exp</i> 
+    <li> <tt>integer</tt> \n <tt>the_integer_constant</tt> \n
+    <li> <tt>string</tt> \n <tt>the_string_constant</tt> \n
+    <li> <tt>identifier</tt> \n variable:<i>identifier</i> 
+    <text class="text-warning">
+    (note that this is <i>not</i> the same as the
+    <tt>integer</tt> and <tt>string</tt> cases above)</text> 
+    <li> <tt>true</tt> \n
+    <li> <tt>false</tt> \n
+  </ul> 
+  <li> <b>To Output A <tt>let</tt> Expression.</b> 
+  (Output the line number, as usual.) Output <tt>let</tt> \n. Then output
+  the binding list. To output a
+  binding, do either: <ul> 
+    <li> <tt>let_binding_no_init</tt> \n variable:<i>identifier</i> type:<i>identifier</i> 
+    <li> <tt>let_binding_init</tt> \n variable:<i>identifier</i> type:<i>identifier</i> value:<i>exp</i> 
+  </ul> 
+  Finally, output the expression that is the body of the <tt>let</tt>. 
+  <li> <b>To Output A <tt>case</tt> Expression.</b> 
+  (Output the line number, as usual.) Output <tt>case</tt> \n. Then output
+  the case expression. Then output the case-elements list. To output a
+  case-element, output the variable as an <i>identifier</i>, then the type
+  as an <i>identifier</i>, then the case-element-body as an <i>exp</i>. 
+</ul> 
+<p> 
+Example input: 
+</p> 
+<prE>
+(* Line 01 *)
+(* Line 02 *)
+(* Line 03 *)  class List {
+(* Line 04 *)     -- Define operations on lists.
+(* Line 05 *)
+(* Line 06 *)     cons(i : Int) : List {
+(* Line 07 *)        (new Cons).init(i, self)
+(* Line 08 *)     };
+(* Line 09 *)
+(* Line 10 *)  };
+</pre> 
+<p> 
+Example <tt>.cl-ast</tt> output <i>with comments</i>.  
+</p> 
+<pre>1                      -- number of classes                   
+3                      --  line number of class name identifier
+List                   --  class name identifier
+no_inherits            --  does this class inherit? 
+1                      --  number of features
+method                 --   what kind of feature? 
+6                      --   line number of method name identifier
+cons                   --   method name identifier
+1                      --   number of formal parameters
+6                      --    line number of formal parameter identifier
+i                      --    formal parameter identifier
+6                      --    line number of formal parameter type identifier
+Int                    --    formal parameter type identifier
+6                      --   line number of return type identifier
+List                   --   return type identifier
+7                      --    line number of body expression 
+dynamic_dispatch       --    kind of body expression 
+7                      --     line number of dispatch receiver expression 
+new                    --     kind of dispatch receiver expression  
+7                      --      line number of new-class identifier 
+Cons                   --      new-class identifier
+7                      --     line number of dispatch method identifier
+init                   --     dispatch method identifier
+2                      --     number of arguments in dispatch 
+7                      --      line number of first argument expression
+identifier             --      kind of first argument expression
+7                      --       line number of the identifier
+i                      --       what is the identifier? 
+7                      --      line number of second argument expression
+identifier             --      kind of second argument expression
+7                      --       line number of the identifier
+self                   --       what is the identifier? 
+</prE> 
+<p> 
+The <tt>.cl-ast</tt> format is quite verbose, but it is particularly easy
+for later stages (e.g., the type checker) to read in again without having
+to go through all of the trouble of "actually parsing". It will also make
+it particularly easy for you to notice where things are going awry if your
+parser is not producing the correct output. 
+</p> 
+<p> 
+Writing the rote code to output a <tt>.cl-ast</tt> text file given an AST 
+may take a bit of time but it should not be difficult; our reference
+implementation does it in 116 lines and cleaves closely to the structure
+given above.  
+</p> 
+
+<h3>Parser Generators</h3> 
+
+<P>
+You must use a parser generator or similar library for this
+assignment.
+</p> 
+<ul>
+
+<li> 
+The <a href="http://caml.inria.fr/pub/docs/manual-ocaml/lexyacc.html">OCaml
+parser generator</a> is called <tt>ocamlyacc</tt> and it comes
+with any OCaml distribution. 
+
+<li> 
+Haskell uses <a href="http://www.haskell.org/happy/">the Happy parser
+generator</a>. You could also use a parser combinator library. Happy is part
+of the Haskell Platform.
+
+<li> 
+A <a href="http://zaach.github.io/jison/">JavaScript parser 
+generator</a> called <tt>jison</tt> is available. You must download it
+yourself. 
+  <ul>
+  <li> <a href="http://jscc.phorward-software.com/">Alternate tool:
+  JS/CC.</a> 
+  </ul> 
+
+<li> 
+A <a href="http://i.loveruby.net/en/projects/racc/">Ruby parser generator</a>, 
+called <tt>racc</tt>, is available, but you must download it yourself. 
+
+<li> 
+A <a href="http://www.dabeaz.com/ply/">Python parser analyzer
+generator</a> called <tt>ply</tt> is available, but you must download it
+yourself. 
+</ul>
+
+<p>
+All of these parser generators are derived from <tt>yacc</tt> (or
+<tt>bison</tt>), the 
+<a href="http://en.wikipedia.org/wiki/Yacc">original
+parser generator for C</a>. Thus you may find it handy to 
+refer to <a href="http://dinosaur.compilertools.net/yacc/index.html">the
+Yacc paper</a> or <a href="http://www.gnu.org/software/bison/manual/">the
+Bison manual</a>. When you're reading, mentally translate the C code
+references into the language of your choice. 
+</p> 
+
+<h3>Commentary</h3> 
+
+<p>
+You can do basic testing as follows: 
+</p> 
+<div class="panel panel-primary"><div class="panel-body">
+$ cool --lex file.cl  <br>
+$ cool --out reference --parse file.cl <br>
+$ my-parser file.cl-lex<br>
+$ diff -b -B -E -w file.cl-ast reference.cl-ast <br>
+</div></div> 
+<p>
+You may find the reference compiler's 
+<tt>--unparse</tt> option</a> useful for
+debugging your <tt>.cl-ast</tt> files. 
+</p> 
+
+<h3>Hint</h3> 
+
+<p>
+If you are failing every negative test case, it is likely that you are not
+handling cross-platform compatibility correctly on <i>all</i> of your
+inputs and outputs.
+</p> 
+
+
+<h1>Video Guides</h1> 
+
+<p>
+A number of Video Guides are provided to help you get started on this
+assignment on your own. The Video Guides are walkthroughs in which the
+instructor manually completes and narrates, in real time, the
+first part of this assignment &mdash; including a submission to an
+older grading server. They include coding, testing and debugging elements.
+</p> 
+<p>
+If you are still stuck, you can post on the forum
+or approach the professor. The use of online
+instructional content outside of class weakly approximates a 
+<a href="https://en.wikipedia.org/wiki/Flipped_classroom">flipped classroom
+model</a>. Click on a video guide to begin, at which point you can watch
+it fullscreen or via Youtube if desired.
+</p> 
+<p>
+<div class="row">
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/kearNtiYWr8"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>Python + PLY</center>
+  </div> 
+
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/3xCJMyawoxg"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>OCaml + ocamllex</center>
+  </div> 
+</div> 
+</p> 
+
+<h1>What to Turn In For PA3</h1> 
+
+<p>
+You must turn in a these files: 
+</p> 
+<ol>
+  <li> <tt>readme.txt</tt> &mdash; your README file 
+  <li> <tt>good.cl</tt> &mdash; a novel positive testcase
+  <li> <tt>bad.cl</tt> &mdash; a novel negative testcase
+  <li> <tt><i>source_files</i></tt> &mdash; including
+    <ul>
+      <li> <i>main.rb</i> (with <i>some_file.y</i>) or
+      <li> <i>main.py</i> or
+      <li> <i>main.js</i> (with <i>some_file.jison</i> if applicable) or
+      <li> <i>main.hs</i> (with <i>some_file.{y,ly}</i> if applicable) or
+      <li> <i>main.ml</i> (with <i>some_file.mly</i> if applicable)  
+    </ul>
+</ol> 
+
+<h1>Grading Rubric</h1> 
+<p> 
+PA3 Grading (out of 50 points):
+</p> 
+    <ul>
+    <li> 38 points &mdash; for autograder tests 
+      <ul> 
+      <li> The scoring is directly proportional to the number of autograder
+      tests you pass. 
+      </ul> 
+    <li> 4 points &mdash; for a clear description in your README
+      <ul> 
+      <li> 4 &mdash; thorough discussion of design decisions (e.g., the handling
+      of <tt>let</tt>) and choice of test cases; a few paragraphs
+      of coherent English sentences should be fine
+      <li> 2 &mdash; vague or hard to understand; omits important details
+      <li> 0 &mdash; little to no effort, or submitted an RTF/DOC/PDF file
+      instead of plain TXT 
+      </ul>
+    <li> 4 point &mdash; for valid and novel <tt>good.cl</tt> and <tt>bad.cl</tt> files
+      <ul> 
+      <li> 4 &mdash; wide range of test cases added, stressing most Cool features and an error condition, novel file
+      <li> 2 &mdash; added some tests, but the scope not sufficiently broad
+      <li> 0 &mdash; little to no effort, or part of course file resubmitted as test case
+      </ul>
+    <li> 4 point &mdash; for code cleanliness
+      <ul> 
+      <li> 4 &mdash; code is mostly clean and well-commented
+      <li> 2 &mdash; code is sloppy and/or poorly commented in places
+      <li> 0 &mdash; little to no effort to organize and document code
+      </ul>
+    <li> -5 points &mdash; if you neglected to include the grammar definition
+      <ul>
+      <li> 0 &mdash; included grammar definition in submission (e.g.,
+      <tt>.mly</tt> file, PLY file defining grammar, <tt>.y</tt> file for
+      racc, etc.)
+      <li> -5 &mdash; only submitted machine-generated parser; failed to submit
+      grammar from which parser was generated
+      </ul>
+    </ul> 
+
+</div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+</body>
+</html>

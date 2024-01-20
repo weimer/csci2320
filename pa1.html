@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CSCI 2320 &mdash; Principles of Programming Languages</title>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+   <link href="css/starter-template.css" rel="stylesheet">
+</head> 
+
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" class="active" href="index.html">Principles of Programming Languages</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <!-- <li class="active"><a href="#">Home</a></li> --> 
+            <li><a href="lectures.html">Lectures</a></li>
+            <li class="dropdown active">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">Assignments <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="pa1.html">PA1 &mdash; Rosetta</a></li> 
+                  <li><a href="pa2.html">PA2 &mdash; Lexer</a></li> 
+                  <li><a href="pa3.html">PA3 &mdash; Parser</a></li> 
+                  <li><a href="pa4.html">PA4 &mdash; Semantic Analyzer</a></li> 
+                  <li><a href="pa5.html">PA5 &mdash; Interpreter</a></li> 
+                  <li class="divider"></li>
+
+                  <li><a href="https://autograder.io/web/course/262">Project Submission</a></li> 
+                </ul>
+            </li> 
+            <li><a href="exams.html">Exams</a></li>
+            <li><a href="cool.html">Cool</a></li>
+            <li><a href="https://piazza.com/bowdoin/spring2024/csci2320">Forum</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container">
+<div class="starter-template">
+
+<h1>PA1 &mdash; The Rosetta Stone</h1> 
+
+<p>
+The <a href="http://en.wikipedia.org/wiki/Rosetta_Stone">Rosetta Stone</a> 
+aided linguistic understanding by providing the same text in three
+different languages. In this project you will implement the same simple
+program in <i>two</i> separate languages: OCaml and Cool.
+Both of your implementations will have exactly the same interface, will
+otherwise adhere to the same specification, and should behave exactly the
+same way.  
+<p>
+In PA2 through PA5 you will write an interpreter for Cool, so it is
+important that you learn how Cool works now. 
+</p>
+<p>
+To practice or test your skills, you may also submit 
+C,
+Haskell, 
+JavaScript, 
+Python,
+or Ruby implementations. These will be tested, and can earn you extra
+credit, but are not
+necessary for your grade.
+</p> 
+<p>
+For this assignment, you must work <b>alone</b>. Subsequent assignments
+will allow you to work in pairs. 
+</p> 
+
+<h1>Specification</h1> 
+
+<p>
+Your program must take in a list of dependent tasks and either output
+a valid order in which to perform them or the single word <tt>cycle</tt>.  
+</p> 
+<p> 
+Your program will accept a number of lines of textual input (via <a
+href="http://en.wikipedia.org/wiki/Standard_streams">standard input</a>). 
+There are <b>no</b> command-line arguments &mdash; you must always read
+from standard input. Do not open a named file. Instead, always read from
+standard input. 
+</p> 
+<p> 
+That text input will contain a non-zero but even
+number of lines. Every two lines represent a <i>pair</i> of tasks. The
+first line gives the name of a task, the second line gives the name of a
+task that it depends on. This text input is also called the <i>task list</i>. 
+</p> 
+<p> 
+The task list will contain only standard ASCII characters (no UTF/8 Unicode
+or special accents). The goal is to test programming and program language
+concepts, not your internationalization abilities. 
+</p> 
+<p> 
+Each task name starts at the beginning of the line and extends all the way
+up to (but not including) the end of that line. So the newline or carriage
+return characters <tt>\r</tt> or <tt>\n</tt> are not part of the task name. 
+Each task name is at most 60 characters long. (This limit is to make any C
+implementation easier. Cool and OCaml both support longer strings
+natively, and can thus ignore this length limit.) 
+</p> 
+<p> 
+Example task list: 
+</p> 
+<div class="panel panel-primary">
+  <div class="panel-body">
+learn C<br>
+read the C tutorial<br>
+do PA1<br>
+learn C
+  </div>
+</div> 
+<p>
+The interpretation is that in order to <b>learn C</b> one must first
+<b>read the C tutorial</b> and that in order to <b>do PA1</b> one must
+first <b>learn C</b>. Desired output for this example: 
+</p> 
+<div class="panel panel-primary">
+  <div class="panel-body">
+read the C tutorial<br>
+learn C<br>
+do PA1
+</div></div> 
+<p>
+If the task list containts a <i>cycle</i> of any size, your program should
+output exactly and only the word <b>cycle</b>. Example cyclic input: 
+</p> 
+<div class="panel panel-primary">
+  <div class="panel-body">
+get a job<br>
+have experience<br>
+have experience<br>
+work on a job<br>
+work on a job<br>
+get a job
+</div></div> 
+<p>
+Even if the task list contains a few non-cyclic parts, any single cycle
+forces you to output only the word <tt>cycle</tt>. 
+</p> 
+<p>
+Always output to <a
+href="http://en.wikipedia.org/wiki/Standard_streams">standard output</a>
+only. Do not write anything to stderr. 
+</p> 
+<p>
+There is no fixed limit on the number of lines in the task list (although
+it is not zero and it is even). 
+</p>
+<p>
+Two tasks with the same name are really just the same task. Use standard
+string equality. 
+</p>
+<p>
+Duplicated pairs of tasks are not allowed. For example: 
+</p>
+<div class="panel panel-primary">
+  <div class="panel-body">
+learn C<br>
+read the C tutorial<br>
+do PA1<br>
+learn C<br>
+learn C<br>
+read the C tutorial
+</div></div>
+</pre> </ul>
+<p>
+... that task list is <i>not</i> valid input because the pair <b>learn
+C</b>/<b>read the C tutorial</b> appears twice. Program behavior if the
+task list contains a duplicate pair is undefined. You will not be tested on
+it. 
+</p> 
+<p>
+Your program may <i>not</i> cause any other file I/O to be performed, such
+as creating a temporary file to keep track of some intermediate sorting
+results or writing to stderr (or even causing the interpreter to write a
+warning to stderr). You do not need any such temporary files or
+stderr-printing to solve this problem.  
+</p> 
+
+<h2>Specification &mdash; Choosing Among Unconstrained Tasks</h2> 
+
+<p>
+If there are multiple outstanding unconstrained tasks, your program should
+output them in ascending ASCII alphabetical order.  That is, if you ever
+have two or more tasks, each of which has no remaining dependencies, output
+the one that comes first ASCII-alphabetically. (This constraint makes your
+program deterministic; for any given input there is only one correct
+output.) Example: 
+</p> 
+<div class="panel panel-primary"> <div class="panel-body">
+learn C <br>
+understand C pointers <br>
+learn C <br>
+read the C tutorial <br>
+do PA1 <br>
+learn C
+</div></div> 
+<p>
+Because <b>r</b> comes before <b>u</b>, your output should be: 
+</p>
+<div class="panel panel-primary"> <div class="panel-body">
+read the C tutorial <br>
+understand C pointers  <br>
+learn C <br>
+do PA1
+</div></div> 
+<p> 
+To put it another way, consider this task list: 
+</p> 
+<div class="panel panel-primary"> <div class="panel-body">
+B <br>
+A <br>
+C <br>
+D <br>
+C <br>
+E
+</div></div> 
+<p>
+Which yields a dependency graph like this: 
+</p> 
+<prE>
+A  D E
+|  \ /
+B   C
+</prE> 
+<p>
+The proper ordering for this set of tasks is <b>A B D E C</b>. Note that
+<b>B</b> comes before <b>D</b> and <b>E</b>, even though <b>B</b>
+depends on <b>A</b>. This is because, once <b>A</b> is finished,
+<b>B</b> is free to go and it comes first alphabetically. You may want to
+consider this requirement when you pick your sorting algorithm. Given this
+requirement the answer <b>A D E B C</b> is <i>incorrect</i> and will
+receive no credit. 
+</p> 
+
+<h1>Resources</h1> 
+
+For this programming assignment, two coding resources are available: 
+<ul>
+  <li> <a href="pa1-hint.zip">pa1-hint.zip</a> &mdash; provides concrete
+  implementations of "task list reversal" (a similar, but simpler, problem)
+  in every language associated with this course
+  <li> <a href="pa1-testcases.zip">pa1-testcases.zip</a> &mdash; includes a
+  number of test inputs and expected outputs so that you can test your
+  programs before submitting
+  <li> <a href="pa1-testcases-osx.zip">pa1-testcases-osx.zip</a> &mdash;
+  as above, but with <b>unix</b> linefeed formatting in all text files
+  for use in Mac OS X
+</ul> 
+
+<h1>Commentary</h1> 
+
+<p>
+This problem is just <a
+href="http://en.wikipedia.org/wiki/Topological_sort">topological sort</a>
+not-so-cleverly disguised. Feel free to look up how to do toposort on the
+internet (but remember that you must turn in your own work; you may not
+copy someone else's code and claim it as your own). 
+</p><p>
+Take a look at the files in <tt>pa1-hint.zip</tt>. You could do worse than
+using them as starting points. 
+</p><p>
+If you're having trouble writing anything reasonable in Cool, don't forget
+to look at the <a href="cool.html">other example Cool programs</a>.
+</p><p>
+Building and maintaining an explicit graph structure is probably overkill.
+</p><p>
+You could solve the problem in the Python, Ruby or OCaml first
+(depending on where you are most comfortable) and then just translate
+your solution. Translating into Cool, Haskell, JavaScript
+or C will not be as easy, however.  
+</p><p>
+Use this as an opportunity to see what you like about various languages.
+What do you think of Python's enforced tabbing? How about ML's abysmal
+error reporting? Ruby's below-par execution speed? Haskell's IO Monad? 
+JavaScript's more asynchronous I/O model? C's general hideousness? 
+</p><p>
+For bonus brownie points, try to make any OCaml, Haskell, JavaScript, Ruby
+or Python implementation as functional as possible (e.g., eschew side
+effects). 
+</p>
+
+<h1>Video Guides</h1> 
+
+<p>
+A number of Video Guides are provided to help you get started on this
+assignment on your own. The Video Guides are walkthroughs in which the
+instructor manually completes and narrates, in real time, a similar
+assignment. They include coding, testing and debugging elements.
+</p> 
+<p>
+If you are still stuck, you can post on the forum,
+approach the TAs, or approach the professor. The use of online
+instructional content outside of class weakly approximates a 
+<a href="https://en.wikipedia.org/wiki/Flipped_classroom">flipped classroom
+model</a>. Click on a video guide to begin, at which point you can watch
+it fullscreen or via Youtube if desired.
+</p> 
+<p>
+<div class="row">
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/YuNOs0u2YQ0" 
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>Python</center>
+  </div> 
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/LkiIQxC-kQ8"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>OCaml</center> 
+  </div> 
+</div> 
+</p> 
+<p>
+<div class="row">
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/cDl4nTcQn10" 
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>Cool (Object-Oriented, Long)</center>
+  </div> 
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/02Drt-cyho8"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>Cool (Imperative, Short)</center> 
+  </div> 
+</div> 
+</p> 
+
+<p> 
+<div class="row">
+  <div class="col-xs-6 col-md-4">
+    <center>
+    <img src="youtube-faster.jpg">
+    <p>
+    Reminder: You can watch YouTube videos
+    at 1.5x speed with full audio.
+    </p> 
+    </center>
+  </div> 
+</div> 
+</p> 
+
+
+<h1>Hints</h1> 
+<p>
+Because you receive extra credit for a working Python (or Ruby, if you
+prefer) implementation (see the Grading Rubric below), we recommend that
+you complete the task in Python first. That way you can be sure that you
+understand the toposort <i>algorithm</i> in a familiar language before you
+try it in an unfamiliar one. Once you have it working in Python, you
+translate that into Cool or OCaml (see the Video Guides for an example of
+doing the same problem in Python and then OCaml). The automated grading
+server will grade any Python implementation you submit, giving you useful
+feedback on algorithmic correctness. This "Python-first" approach ends up
+being mathematically optimal for most students. 
+</p> 
+
+<h1>What To Turn In For PA1c</h1> 
+
+<p>
+PA1c is a <b>checkpoint</b> to make sure that you do not fall behind on
+PA1. You have about two weeks to complete all of PA1, but if you try to
+do it all at the last minute you're probably doomed to failure.  
+</p> <p> 
+For the one-week PA1c checkpoint, you must have <i>one</i> of the
+implementations done. This separates the project into two phases: (0) Can I
+write this program at all? and (1) Can I write this program in multiple
+languages? 
+</p> <p> 
+For PA1c you must turn in <b>one source
+file</b>. Use the
+following names: 
+<ol>
+  <li> <tt>rosetta.cl</tt> &mdash; Cool implementation
+  <br> <i>or</i> 
+  <li> <tt>rosetta.ml</tt> &mdash; OCaml implementation
+</ol> 
+<p>
+You may also submit Python, Ruby, JavaScript, Haskell or C implementations
+for PA1 extra credit.  Each of your source files should have one of those names
+(e.g., <tt>rosetta.<i>whatever</i></tt>). 
+</p> 
+
+<h1>What To Turn In For PA1</h1> 
+
+<p>
+For PA1c you must turn in two source
+files and two other files. Use the following names: 
+</p> 
+<ol>
+  <li> <tt>rosetta.cl</tt> &mdash; Cool implementation
+  <li> <tt>rosetta.ml</tt> &mdash; OCaml implementation
+</ol> 
+<p>
+You may also submit Python, Ruby, JavaScript, Haskell or C implementations
+for PA1 extra credit.  
+You must also submit these two files: 
+</p> 
+<ol start="3">
+  <li> <tt>testcase.list</tt> &mdash; a valid task list that you made up
+  <li> <tt>readme.txt</tt> &mdash; your README file 
+</ol> 
+<p>
+The <tt>testcase.list</tt> file should contain a valid novel task list (it
+may or may not contain a cycle &mdash; your choice). 
+</p> <p>
+The <tt>readme.txt</tt> file should be a <i>plain ASCII text file</i> (not a
+Word file, not an RTF file, not an HTML file) describing your design
+decisions. Which language did you start with? How did you store the
+(implicit) graph? Which language was the hardest? One or two English
+paragraphs should suffice. Spelling, grammar, capitalization and
+punctuation all count. 
+</p> 
+
+<h1>Extra Credit</h1> 
+
+<p>
+The submission grading server will accept and report on any of the
+following languages, if you happen to submit them:
+</p> 
+
+<ol>
+  <li> <tt>rosetta.c</tt> &mdash; C implementation
+  <li> <tt>rosetta.cl</tt> &mdash; Cool implementation
+  <li> <tt>rosetta.hs</tt> &mdash; Haskell implementation
+  <li> <tt>rosetta.js</tt> &mdash; JavaScript implementation
+  <li> <tt>rosetta.ml</tt> &mdash; OCaml implementation
+  <li> <tt>rosetta.py</tt> &mdash; Python implementation
+  <br> <i>and/or</i> 
+  <li> <tt>rosetta.rb</tt> &mdash; Ruby implementation
+</ol> 
+
+<p>
+Note that only the Cool and OCaml implementations are required for your
+grade. The others cannot hurt you in any way, but can provide extra credit
+if you complete them perfectly.
+</p>
+
+<h1>Grading Rubric</h1>
+
+<p>
+PA1 Grading (out of 25 points):
+</p> 
+    <ul>
+    <li> 20 points &mdash; autograding
+      <ul>
+      <li> 10 points &mdash; autograder tests for PA1c (either OCaml or
+      Cool)
+      <li> 10 points &mdash; autograder tests for PA1 (either OCaml or
+      Cool, the other one)
+      <li> The scoring is proportional: if there are 8 tests for PA1c and
+      your best submission passes 4 of them (50%), you will receive 5/10
+      points for PA1c (50%). 
+      </ul> 
+    </li> 
+    <li> 4 points &mdash; for a clear description in your README
+      <ul> 
+      <li> 4 &mdash; thorough discussion of design decisions (including language
+      comparisons) and choice of test cases; a few paragraphs
+      of coherent English sentences should be fine
+      <li> 2 &mdash; vague or hard to understand; omits important details
+      <li> 0 &mdash; little to no effort, or submitted an RTF/DOC/PDF file
+      instead of plain TXT
+      </ul>
+    </li> 
+    <li> 1 point &mdash; for a valid <tt>testcase.list</tt> file
+    <p>
+    <li> 5 points <i>extra credit</i> &mdash; for extra languages
+      <ul>
+        <li> 1 point <i>extra credit</i> &mdash; perfect autograder test
+        results for C 
+        <li> 1 point <i>extra credit</i> &mdash; perfect autograder test
+        results for Haskell 
+        <li> 1 point <i>extra credit</i> &mdash; perfect autograder test
+        results for JavaScript 
+        <li> 1 point <i>extra credit</i> &mdash; perfect autograder test
+        results for Python 
+        <li> 1 point <i>extra credit</i> &mdash; perfect autograder test
+        results for Ruby 
+      </ul> 
+    </li> 
+    </ul 
+
+</div>
+</div> 
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+</body>
+</html>

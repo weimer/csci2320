@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CSCI 2320 &mdash; Principles of Programming Languages</title>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+   <link href="css/starter-template.css" rel="stylesheet">
+</head> 
+
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" class="active" href="index.html">Principles of Programming Languages</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <!-- <li class="active"><a href="#">Home</a></li> --> 
+            <li><a href="lectures.html">Lectures</a></li>
+            <li class="dropdown active">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">Assignments <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="pa1.html">PA1 &mdash; Rosetta</a></li> 
+                  <li><a href="pa2.html">PA2 &mdash; Lexer</a></li> 
+                  <li><a href="pa3.html">PA3 &mdash; Parser</a></li> 
+                  <li><a href="pa4.html">PA4 &mdash; Semantic Analyzer</a></li> 
+                  <li><a href="pa5.html">PA5 &mdash; Interpreter</a></li> 
+                  <li class="divider"></li>
+                  <li><a href="https://autograder.io/web/course/262">Project Submission</a></li> 
+                </ul>
+            </li> 
+            <li><a href="exams.html">Exams</a></li>
+            <li><a href="cool.html">Cool</a></li>
+            <li><a href="https://piazza.com/bowdoin/spring2024/csci2320">Forum</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container">
+<div class="starter-template">
+
+<h1>PA5 &mdash; The Interpreter</h1> 
+<p>
+Programming assignments 2 through 4 involved the constructed of the
+front-end (lexer, parser) and gatekeeping (semantic analyzer) stages of an
+interpreter. In this assignment you will write the code that performs the
+execution and interpretation of valid programs. 
+</p> 
+<p>
+You may complete this assignment in OCaml, Haskell, JavaScript, Python or Ruby.
+</p>
+<p>
+You may work in a team of two people for this assignment.  You do not need
+to keep the same teammate. The course staff are not responsible for finding
+you a willing teammate. 
+</p> 
+
+<h1>Goal</h1> 
+
+<p> 
+For this assignment you will write an <i>interpreter</i>. Among other
+things, this involves implementing the operational semantics specification
+of Cool. You will track enough information to generate legitimate run-time
+errors (e.g., dispatch on void). You do not have to worry about "malformed
+input" because the semantic analyzer (from PA4) has already ruled out bad
+programs. 
+</p> 
+<p> 
+You will also write additional code to unserialize the class and
+implementation maps produced by the semantic analyzer and the 
+parse tree produced by the parser. 
+</p> 
+
+<h1>The Specification</h1>
+
+<p>
+You must create three artifacts: 
+</p> 
+<ol>
+
+<li> A program that takes a single command-line argument (e.g.,
+<tt>file.cl-type</tt>). That argument will be an ASCII text 
+Cool <i>class map, implementation map, and AST</i> file (as described in 
+PA4). Your program must execute (i.e.,
+interpret) the Cool program described by that input. 
+If your program is called <tt>interp</tt>, invoking <tt>interp
+file.cl-type</tt> should yield the same output as <tt>cool 
+file.cl</tt>. Your program will consist of a number of OCaml files, a
+number of Python files, or a number of Ruby files. 
+  <ul>
+  <li> You will only be given <tt>.cl-type</tt> files from programs that
+  pass the semantic analysis phase of the reference interpreter. You are
+  <i>not</i> responsible for correctly handling ill-typed (e.g., 1+"hello") programs.
+  </ul>
+<li> A plain ASCII text file called <tt>readme.txt</tt> describing your
+design decisions and choice of test cases. See the grading rubric. A few
+paragraphs should suffice. 
+
+<li> Testcases <tt>test1.cl</tt>, <tt>test2.cl</tt>, <tt>test3.cl</tt> and
+<tt>test4.cl</tt>. The testcases should exercise interpreter and run-time
+error corner cases. 
+
+</ol>
+
+<h1>Error Reporting</h1> 
+
+<p>
+To report an error, write the string
+</p> 
+<div class="panel panel-danger">
+<div class="panel-body">
+<tt>ERROR: <i>line_number</i>: Exception: <i>message</i></tt> 
+</div></div>
+<p> 
+to standard output and terminate the
+program. You may
+write whatever you want in the message, but it should be fairly indicative. 
+Example erroneous input:
+</p> 
+<div class="panel panel-primary"><div class="panel-body">
+class Main inherits IO { <br>
+&nbsp; my_void_io : IO ; -- no initializer => void value <br>
+&nbsp; main() : Object { <br>
+&nbsp; &nbsp; my_void_io.out_string("Hello, world.\n") <br>
+&nbsp; } ; <br>
+} ;
+</div></div> 
+<p> 
+Corresponding example error report output: 
+</p> 
+<div class="panel panel-danger">
+<div class="panel-body">
+ERROR: 4: Exception: dispatch on void
+</div></div> 
+
+<h1>Commentary</h1> 
+
+<p> 
+You will have to handle all of the <i>internal</i> functions (e.g.,
+<tt>IO.out_string</tt>) that you first encountered in PA4. 
+</p>
+
+<p> 
+You can do basic testing as follows: 
+</p> 
+<div class="panel panel-primary"><div class="panel-body">
+$ cool --type file.cl   <br>
+$ cool file.cl &gt;&amp; reference-output <br>
+$ my-interp file.cl-type &gt;&amp; my-output <br>
+$ diff my-output reference-output
+</div></div> 
+
+<p>
+Note that this time, <text class=text-warning>whitespace and newlines
+<i>do</i> matter for normal output</text>. This is because you are specifically
+being asked to implement IO and substring functions. 
+</p> 
+<p>
+You should implement all of the operational semantics rules in the
+Reference Manual.  You will also have to implement all of the built-in
+functions on the five Basic Classes. 
+</p> 
+
+<h1>PA5t &mdash; Creating PA5 Tests</h1> 
+
+<p> 
+PA5t is a <b>preliminary testing exercise</b> that introduces a form of 
+<A href="http://en.wikipedia.org/wiki/Test-driven_development">test-driven
+development</a> or 
+<a href="http://en.wikipedia.org/wiki/Mutation_testing">mutation
+testing</a> into our software development process and requires you to
+construct a high-quality test suite. 
+</p> 
+<p>
+The goal of PA5t is to leave you with a high-quality test suite of Cool
+programs that you can use to evaluate your own PA5 Interpreter. Writing
+an interpreter requires you to consider many corner cases (perhaps even
+more than in PA4!) when reading the
+formal operational semantics rules 
+in the Cool Reference Manual. While you 
+you can check for correct "positive" behavior by comparing your
+interpreter's output to the reference interpreters's output on 
+the usual "good"
+Cool programs, it is comparatively harder to check for "corner case"
+behavior.
+</p> 
+<p>
+If you fail to construct a rich test suite of semantically-valid 
+tricky programs you will face a frustrating series of "you
+fail held-out negative test <i>x</i>" reports for PA5 proper, which can
+turn into unproductive guessing games. Because students often report that
+this is frustrating (even though it is, shall we say, infinitely more
+realistic than making all of the post-deployment tests visible in advance),
+the PA5t preliminary testing exercise provides a structured means to help
+you get started with the constuction of a rich test suite. 
+</p> 
+<p> 
+The course staff have produced 22 variants of the reference compiler, each
+with a secret <a
+href="http://en.wikipedia.org/wiki/Fault_injection">intentionally-introduced 
+defect</a> related to Interpretation. A high-quality test suite
+is one that <i>reveals</i> each introduced defect by showing a difference
+between the behavior of the true reference compiler and the corresponding
+buggy verison. You desire a high-quality test suite to help you gain
+confidence in your own PA5 submission.
+</p> 
+<p> 
+For PA5t, you must produce syntactically valid Cool programs (test cases). 
+There are 22 separate held-out seeded interpreter bugs waiting on the
+grading server. For each bug, if one of your tests causes the reference 
+and the buggy version to produce difference output (that is
+different stdout/stderr), you win:
+that test has revealed that bug. For full credit your tests must reveal at
+least 17 of the 22 unknown defects. 
+</p> 
+<p>
+The secret defects that we have injected into the reference compiler
+correspond to common defects made by students in PA5. Thus, if you make a
+rich test suite for PA5t that reveals many defects, you can use it on your
+own PA5 submission to reveal and fix your own bugs! 
+</p> 
+
+<h1>Video Guides</h1> 
+
+<p>
+A number of Video Guides are provided to help you get started on this
+assignment on your own. The Video Guides are walkthroughs in which the
+instructor manually completes and narrates, in real time, the
+first part of this assignment &mdash; including a submission to the
+grading server. They include coding, testing and debugging elements.
+</p> 
+<p>
+If you are still stuck, you can post on the forum
+or approach the professor. The use of online
+instructional content outside of class weakly approximates a 
+<a href="https://en.wikipedia.org/wiki/Flipped_classroom">flipped classroom
+model</a>. Click on a video guide to begin, at which point you can watch
+it fullscreen or via Youtube if desired.
+</p> 
+<p>
+<div class="row">
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/dWpJQ0lrJhs"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>PA5<b>t</b> &mdash; Test Cases</center>
+  </div> 
+
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/i-nBIxE5Xcs"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>PA5<b>c</b> &mdash; Interpreting</center>
+  </div> 
+
+</div> 
+</P>
+<p> 
+<div class="row">
+  <div class="col-xs-6 col-md-4">
+    <div class="embed-responsive embed-responsive-16by9"><iframe 
+    src="https://www.youtube.com/embed/eQRRlZoVxSc"
+    frameborder="0" allowfullscreen></iframe></div> 
+    <center>PA5 &mdash; Automating Testing and 
+    Minimizing Tests (Delta Debugging)</center>
+  </div> 
+
+
+</div> 
+</p> 
+
+
+<h1>What to Turn In For PA5t</h1> 
+<p> 
+For PA5t you should turn in (electronically): 
+</p> 
+<ul>
+  <li> A set of <tt>.cl</tt> 
+  (and possibly corresponding <tt>.cl-input</tt>) files: Cool interpreter
+  testcases. 
+    <ul>
+    <li> Each testcase you submit must be semantically valid (i.e., must
+    pass <tt>cool --type</tt>).
+    <li> Each testcase you submit <i>may</i> have a corresponding input
+    file. For example, if you submit <tt>wes.cl</tt> you may also submit
+    <tt>wes.cl-input</tt>, and that test will be run with a command like
+    <tt>cool wes.cl-type &lt; wes.cl-input &gt;&amp; output.txt</tt>. 
+    <li> Each testcase you submit must be at most 2048 characters (i.e.,
+    <tt>wc -c yourtest.cl</tt> says 2048 or less). You want each of your
+    testcases to be meaningful so that it helps you narrow down a bug later
+    (cf. Delta Debugging).
+      <ul>
+        <li> Q: Ha ha! I will get around this edict by removing comments and
+        compressing whitespace and variable names.
+        <li> A: Remember, the point of PA5t is not to make me happy, but to
+        provide you with a high quality test suite. You're only hurting
+        yourself later by making low-quality tests now. When your
+        interpreter fails one of your own tests later you'll end up
+        shrinking the test down as part of debugging, so you're not
+        actually saving yourself any time.
+      </ul> 
+
+    <li> Each testcase you submit may run to completion or it may
+    trigger some run-time error. None of the seeded defects you are trying
+    to uncover are intentionally related to infinite loops. Do not spam our
+    server.
+      <ul>
+      <li> Clarification: Similarly, none of the errors are related to
+      large memory allocations or exhausting the heap at run-time (e.g., by
+      making arbitrarily large strings, etc.). 
+      </ul> 
+    <li> No testcase should be named <tt>bug...</tt> or <tt>ref...</tt>
+    because the testing server uses those prefices internally. If you
+    submit a test case with such a name it will be ignored. (Limited course
+    resources can either be spent making better lectures, grading your
+    assignments, etc., or ironing out wrinkles such as these from grading
+    scripts. We have chosen to focus on pedagogy.) 
+    </ul> 
+</ul> 
+<p>
+Hint: All of the usual tactics apply (from randomly-generating programs to
+permuting one symbol in each operational semantics rule to 
+reading the prose descriptions in the CRM and looking for words like
+"must" to digging through the reference compiler binary). 
+</p> 
+
+<h1>PA5c &mdash; Checkpoint</h1> 
+
+<p>
+PA5c is a <b>checkpoint</b> for PA5. The Interpreter is a large and
+complicated assignment; we do not want you to fall behind. 
+</p> 
+<p> 
+For the PA5c checkpoint you will <b>only</b> be tested on something 
+akin to 
+<tt>hello-world.cl</tt>.  If you can interpret that, you
+pass the checkpoint. (You can "cheat" the checkpoint by hard-coding output
+for that single test case, but you're ultimately only hurting yourself!) 
+The goal of the checkpoint is not to do the minimal amount of work
+possible for this program, but instead to do the greatest amount possible
+now so that you have plenty of time for the rest of the features later. 
+</p> 
+<p>
+You must turn in a <b>zip file</b> containing these files: 
+</p> 
+<ol>
+  <li> <tt><i>source_files</i></tt> &mdash; your implementation, including
+    <ul>
+      <li> <i>main.rb</i> or
+      <li> <i>main.py</i> or
+      <li> <i>main.js</i> or
+      <li> <i>main.hs</i> or
+      <li> <i>main.ml</i> 
+    </ul>
+</ol> 
+<p>
+Your zip file <b>may</b> also contain: 
+</p> 
+<ul>
+  <li> <tt>team.txt</tt> -- an optional file listing your other team member
+</ul>
+
+<h1>What to Turn In For PA5</h1> 
+
+<p>
+You must turn in a <b>zip file</b> containing these files: 
+</p> 
+<ol>
+  <li> <tt>readme.txt</tt> &mdash; your README file 
+  <li> <tt>test1.cl</tt> &mdash; a novel testcase
+  <li> <tt>test2.cl</tt> &mdash; a novel testcase
+  <li> <tt>test3.cl</tt> &mdash; a novel testcase
+  <li> <tt>test4.cl</tt> &mdash; a novel testcase
+  <li> <tt><i>source_files</i></tt> &mdash; your implementation, including
+    <ul>
+      <li> <i>main.rb</i> or
+      <li> <i>main.py</i> or
+      <li> <i>main.js</i> or
+      <li> <i>main.hs</i> or
+      <li> <i>main.ml</i> 
+    </ul>
+</ol> 
+<p>
+Your zip file <b>may</b> also contain: 
+</p> 
+<ul>
+  <li> <tt>team.txt</tt> &mdash; an optional file listing your other team member
+</ul>
+
+<h1>Language-Specific Hints</h1>
+
+<p>
+Python hint:
+</p> 
+
+<blockquote>
+<p>
+  I was performing the computation 4 / -59. In a very strange turn of
+  events, this computation returns 0 in a simple C program (and,
+  apparently, in OCaml), but -1 in Python. Bwah? 
+  </p> 
+  <p>
+<a
+href="http://python-history.blogspot.com/2010/08/why-pythons-integer-division-floors.html">Python's
+division truncation works differently from C's</a>. This is more than a
+little annoying, and certainly a "gotcha".
+</p> 
+<small>
+previous student Charles Eckman
+</small> 
+</blockquote>
+
+<p>
+Charles reports that he was able to solve the problem by adding
+<tt>from __future__ import division</tt> 
+to the top of his Python source, which makes the division operator always
+return a floating-point result. That result can then be cast to an integer
+via the <tt>int()</tt> constructor.
+</p> 
+
+<h1>Grading Rubric</h1>
+
+<p> 
+PA5 Grading (out of 100 points):
+</p> 
+    <ul>
+    <li> 66 points &mdash; for autograder tests 
+    <li> 5 points &mdash; for a correct PA5<b>t</b> submission
+    <li> 5 points &mdash; for a correct PA5<b>c</b> submission
+    <li> 8 points &mdash; for a clear description in your README
+      <ul> 
+      <li> 8 &mdash; thorough discussion of design decisions (e.g., the handling
+      of <tt>let</tt> and <tt>new</tt> and dispatch) 
+      and choice of test cases; a few paragraphs of coherent English
+      sentences should be fine
+      <li> 4 &mdash; vague or hard to understand; omits important details
+      <li> 0 &mdash; little to no effort, or submitted an RTF/DOC/PDF file
+      instead of plain TXT 
+      </ul>
+    <li> 8 point &mdash; for valid and novel <tt>test1.cl</tt>, <tt>test2.cl</tt>,
+    <tT>test3.cl</tt> and <tt>test4.cl</tt> files
+      <ul> 
+      <li> 8 &mdash; wide range of test cases added, stressing most Cool features
+      and some error conditions, novel files
+      <li> 4 &mdash; added some tests, but the scope not sufficiently broad
+      <li> 0 &mdash; little to no effort, or parts of course files
+      resubmitted as tests
+      </ul>
+    <li> 8 point &mdash; for code cleanliness
+      <ul> 
+      <li> 8 &mdash; code is mostly clean and well-commented
+      <li> 4 &mdash; code is sloppy and/or poorly commented in places
+      <li> 0 &mdash; little to no effort to organize and document code
+      </ul>
+    </ul> 
+
+</div>
+</div> 
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+</body>
+</html>

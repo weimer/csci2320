@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CS 2320 &mdash; Principles of Programming Languages</title>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+   <link href="css/starter-template.css" rel="stylesheet">
+</head> 
+
+<style>
+@media (max-width: 550px) {
+   .big-container {
+       display: none;
+   }
+}
+@media (min-width: 550px) {
+   .small-container {
+       display: none;
+   }
+}
+/* Responsive iFrame */
+.responsive-iframe-container {
+   position: relative;
+   padding-bottom: 56.25%;
+   padding-top: 30px;
+   height: 0;
+   overflow: hidden;
+}
+.responsive-iframe-container iframe,   
+.vresponsive-iframe-container object,  
+.vresponsive-iframe-container embed {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+}
+</style>
+
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" class="active"
+          href="index.html">Principles of Programming Languages</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <!-- <li class="active"><a href="#">Home</a></li> --> 
+            <li><a href="lectures.html">Lectures</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">Assignments <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="pa1.html">PA1 &mdash; Rosetta</a></li> 
+                  <li><a href="pa2.html">PA2 &mdash; Lexer</a></li> 
+                  <li><a href="pa3.html">PA3 &mdash; Parser</a></li> 
+                  <li><a href="pa4.html">PA4 &mdash; Semantic Analyzer</a></li> 
+                  <li><a href="pa5.html">PA5 &mdash; Interpreter</a></li> 
+                  <li class="divider"></li>
+                  <li><a href="https://autograder.io/web/course/262">Project Submission</a></li> 
+                </ul>
+            </li> 
+            <li><a href="exams.html">Exams</a></li>
+            <li><a href="cool.html">Cool</a></li>
+            <li><a href="https://piazza.com/bowdoin/spring2024/csci2320">Forum</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container">
+<div class="starter-template">
+
+<h1>Lectures and Details</h1>
+
+      <div class="row">
+
+        <div class="col-xs-2 col-md-2">Meetings</div>
+        <div class="col-xs-10 col-md-10">
+          <p> Languages: Tuesday/Thursday, Searles 223, 2:50 &ndash; 4:15</p>
+          </p> 
+        </div>
+
+        <div class="col-xs-2 col-md-2">Textbook</div>
+        <div class="col-xs-10 col-md-10">
+        <p>
+        Michael L. Scott's <A href="http://www.cs.rochester.edu/u/scott/pragmatics/">Programming Language Pragmatics</a>
+        </p> 
+        <p>
+        Videos from Westley Weimer's
+        <a href="https://www.youtube.com/playlist?list=PLAwxTw4SYaPlI9QCVVfXxwJYqJWyts10f">Introduction to Programming Languages</a> via Udacity
+        (free) 
+        </p> 
+        </div>
+
+
+        <div class="col-xs-2 col-md-2">Instructor</div>
+        <div class="col-xs-10 col-md-10">
+          <p> Languages: <a href="https://web.eecs.umich.edu/~weimerw/">Westley Weimer</a>, OH Adams 410, Time TBD</p>
+        </div>
+
+
+
+      </div>
+
+
+<h1>Overview</h1>
+
+<p> 
+<b>Principles of Programming Languages</b> (CSCI 2320) will acquaint
+you with the fundamental ideas surrounding the design and implementation of
+high-level programming languages. The course will stress underlying theoretical
+concepts as well as a significant, practical course project. At the same
+time, the course will focus on making this material accessible to students
+of varied backgrounds. 
+</p>
+<p>
+Students will gain experience with functional and object-oriented programming
+via the 
+<a href="http://en.wikipedia.org/wiki/Objective_Caml">
+OCaml</a> and
+<a href="cool.html">Cool</a> programming languages. In addition, students
+may complete assignments using the
+<a href="http://en.wikipedia.org/wiki/Python_%28programming_language%29">
+Python</a>,
+<a href="http://en.wikipedia.org/wiki/Ruby_programming_language">
+Ruby</a>, 
+<a href="http://en.wikipedia.org/wiki/JavaScript">
+JavaScript</a>, or
+<a href="http://en.wikipedia.org/wiki/Haskell_%28programming_language%29">
+Haskell</a> languages.
+The Assignments and final project in this course lead to the
+construction of an <a
+href="http://en.wikipedia.org/wiki/Interpreter_%28computing%29">interpreter</a>
+for a subset of Java. This involves scanning, parsing,
+type-checking and interpreting code. You will master concepts such as
+context-free grammars, variable bindings, control flow, types, subtyping,
+and method invocation. 
+</p>
+
+<h1>Project and Assignments</h1> 
+<p>
+The course project consists of 
+five Programming
+Assignments. Taken together,
+the assignments form a complete interpreter for <a href="cool.html">Cool,
+the <i>Classroom Object-Oriented Language</i></a>. 
+The project components are assigned in roughly increasing order of size and
+difficulty; proportionately more time is allotted for the later
+assignments.  Later assignments will be weighted more heavily in the final
+grade. 
+</p>
+<p> 
+Programs will be evaluated for correctness,
+organization, and documentation.
+</p> 
+<p> 
+Assignments may be done individually or in teams of two. The
+first assignment must be done
+individually, however. Teamwork imposes burdens of communication and
+coordination, but has the benefits of more thoughtful designs and cleaner
+programs. Team programming is also the norm in the professional world.
+</p>
+<p>
+Students on a team are expected to participate equally in the effort and to
+be thoroughly familiar with all aspects of the joint work. Both members
+bear full responsibility for the completion of assignments. Partners turn
+in one solution for each Assignment; each member receives the
+same grade for the assignment. If a partnership is not going well, speak
+with the instructor. 
+</p> 
+<p> 
+Assignments are due at <b>11:50pm</b> on the date in the course
+schedule. Programming Assignments will be turned in electronically via a
+special submission server.
+</p> 
+
+<h1>Course Programming Languages</h1> 
+
+<p>
+Three programming languages are required as part of this course: 
+</p>
+
+<ul>
+
+<li>
+<a href="cool.html">Cool</a> is an imperative, strongly-typed
+classroom object-oriented programming language. It can be viewed as a
+simplified version of Java. You will learn Cool as part of this course.
+
+<li> 
+<a href="https://ocaml.org/">OCaml</a> is an efficient, functional,
+strongly-typed, object-oriented language with imperative support. You will
+learn OCaml as part of this course. 
+
+<li>
+<a href="https://www.python.org/">Python</a>
+is a structured, imperative programming language with
+a high emphasis on readability and support for object-oriented and
+functional programming. You are expected to know imperative and
+object-oriented prorgamming in Python before entering this course; you will
+learn functional programming in Python as part of this course.
+
+</ul> 
+
+<p>
+In addition, three additional optional languages are available and
+you may use them to complete programming assignments.
+</p> 
+
+<ul>
+
+<li> 
+<a href="https://www.haskell.org/">Haskell</a> 
+is an advanced, statically-typed, lazy, purely functional language. 
+
+<li>
+<a href="https://en.wikipedia.org/wiki/JavaScript">JavaScript</a>
+is a dynamically-typed language with object-oriented, imperative
+and functional support; it is often used in web and asynchronous
+programming. 
+
+<li> 
+<a href="https://www.ruby-lang.org/en/">Ruby</a>
+is an imperative, dynamically typed, object-oriented
+language with functional support. 
+
+</ul> 
+
+<h1>Review Sets</h1>
+
+<p>
+There are <a href="exams.html">seven Review Sets</a> 
+provided for this course.
+These Review Sets are not graded assignments, and
+are instead provided as a structured system for students to evaluate
+their mastery of the material and prepare for written examinations. The
+instructor will be happy to go over Review Set
+answers during office hours.
+</p>
+
+<h1>Examinations</h1>
+
+<p>
+This course features <a href="exams.html">two midterm
+examinations</a> and may contain a final examination. The midterms will be
+take home. 
+</P>
+<p>
+The exams are open-note by default.
+It may not be possible to give late or make-up exams:
+please plan accordingly. 
+</p>
+
+<h1>Grading</h1>
+
+<p>
+The relative weight of the
+components of your grade will be approximately:
+</p> 
+
+<div class="container">
+      <div class="row row-centered">
+        <div class="col-xs-6 col-sm-4 col-centered col-min">
+
+<ul class="list-group">
+  <li class="list-group-item">
+    <span class="badge">5%</span> Programming Assignment I
+  </li>
+  <li class="list-group-item">
+    <span class="badge">8%</span> Programming Assignment II
+  </li>
+  <li class="list-group-item">
+    <span class="badge">10%</span> Programming Assignment III
+  </li>
+  <li class="list-group-item">
+    <span class="badge">12%</span> Programming Assignment IV
+  </li>
+  <li class="list-group-item">
+    <span class="badge">15%</span> Programming Assignment V
+  </li>
+  <li class="list-group-item">
+    <span class="badge">15%</span> Midterm Examination I
+  </li>
+  <li class="list-group-item">
+    <span class="badge">15%</span> Midterm Examination II
+  </li>
+  <li class="list-group-item">
+    <span class="badge">15%</span> Final Examination
+  </li>
+  <li class="list-group-item">
+    <span class="badge">5%</span> Reading Quizzes &amp; Participation
+  </li>
+</ul>
+</div></div> </div> 
+
+<p>
+The course may be curved &mdash; but it will only be curved upward. We
+never reduce your grade. 
+</p> 
+<p> 
+We follow <a
+href="https://www.bowdoin.edu/dean-of-students/ccs/community-standards/the-codes.html">the Bowdoin Academic Honor Code</a>.
+You should know that fairly sophisticated plagiarism detection software
+may be used on the Assignments; cheating on an assignment or exam
+typically results in a score of 0 for it as well as a score of 0 for the
+entire course. 
+</p> 
+
+<h1>Regrade and Late Policy</h1>
+
+<p>
+An assignment turned in <i>h</i> hours late has its point value reduced by
+<i>h</i>%. Thus if you turn in a Assignment at 8am the next day
+(i.e., 8 hours late) your grade for that assignment will be multiplied by
+0.92. 
+</p> 
+<p>
+Each student has <b>three late-day tokens</b> for programming submissions. 
+Each token allows you to submit an assignment 24 hours after its hard
+deadline. These are "no questions asked" grace days &mdash; you do not have
+to explain to me what the reason is or talk about any issues unless you
+want to. 
+</p> 
+<p> 
+Regrades for exams, Assignments, or written assignments must be
+received within <b>one week</b> of you receiving your score. All regrade
+requests should be made to the instructor. When we regrade an assignment we will
+look over it very carefully for correctness: it is possible that after a
+regrade you will end up with <i>fewer</i> points than before the regrade.
+</p> 
+<p>
+All course materials submitted for a grade must be turned in by the last
+date marked on the course syllabus.
+</p> 
+
+<h1>Research</h1>
+
+<p>
+Your class work might be used for research purposes. For example, we may
+use anonymized student assignments to design algorithms or build tools to
+help programmers. (If you're curious about how anonymized student data has
+led to research advances in the past, ask on the forum!) 
+Any student who wishes to opt out can contact the
+instructor to do so after final grades have been issued. This has no
+impact on your grade in any manner. 
+</p> 
+<p>
+Students interested in considering undergraduate research should make an
+appointment to talk about it. While I am not in a position to supervise
+Bowdoin students directly, I can talk about approaching other professors and
+help assess potential research or thesis ideas. I am also happy to discuss
+graduate school. 
+</p> 
+
+<h1>Additional References</h1>
+<p>
+You may find the following additional resources helpful: 
+</p> 
+
+<ul>
+<li> Hal Abelson, Jerry Sussman, and Julie Sussman's 
+<a href="http://mitpress.mit.edu/sicp"><i>Structure and Interpretation of
+Computer Programs</i></a>. The book's full text is available on-line and it is
+an excellent resource for functional programming and the lambda calculus. 
+<li> Aho, Sethi and Ullman's 
+<i>Compilers: Principles, Techniques, and Tools</i>. Also known as 
+<a
+href="http://en.wikipedia.org/wiki/Compilers:_Principles%2C_Techniques%2C_and_Tools">the Dragon book</a>, it covers basic compiler technology. 
+<li> Andrew Appel's <i>Modern Compiler Implementation in Java</i>. 
+
+</ul>
+
+</div>
+</div> 
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+</body>
+</html>

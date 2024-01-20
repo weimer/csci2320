@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>CS 2320 &mdash; Principles of Programming Languages</title>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+   <link href="css/starter-template.css" rel="stylesheet">
+</head> 
+
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" class="active"
+          href="index.html">Principles of Programming Languages</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <!-- <li class="active"><a href="#">Home</a></li> --> 
+            <li><a href="lectures.html">Lectures</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="true">Assignments <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="pa1.html">PA1 &mdash; Rosetta</a></li> 
+                  <li><a href="pa2.html">PA2 &mdash; Lexer</a></li> 
+                  <li><a href="pa3.html">PA3 &mdash; Parser</a></li> 
+                  <li><a href="pa4.html">PA4 &mdash; Semantic Analyzer</a></li> 
+                  <li><a href="pa5.html">PA5 &mdash; Interpreter</a></li> 
+                  <li class="divider"></li>
+                  <li><a href="https://autograder.io/web/course/262">Project Submission</a></li> 
+                </ul>
+            </li> 
+            <li><a href="exams.html">Exams</a></li>
+            <li class="active"><a href="cool.html">Cool</a></li>
+            <li><a href="https://piazza.com/bowdoin/spring2024/csci2320">Forum</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container">
+<div class="starter-template">
+
+<h1>Cool Overview</h1>
+
+<p>
+<b>Cool</b> is a <i>Classroom Object-Oriented Language</i> &mdash; it is
+essentially a small subset of Java. It's small enough to be manageable for
+semester projects but large enough to help you to learn all of the concepts
+and to write non-trivial programs. 
+</p> 
+
+<div class="panel panel-primary"><div class="panel-body">
+<tt>
+<font color=lightgreen>(* hello-world.cl *)</font>  <br>
+<font color=cyan>class</fonT> Main <font color=cyan>inherits</font> IO { <br>
+&nbsp; main() : Object { <br>
+&nbsp; &nbsp;    out_string(<font color=yellow>"Hello, world.\n"</font>) <br>
+&nbsp; } ; <br>
+} ; <br>
+</tt>
+</div></div> 
+
+<h1>Cool Reference Manual</h1> 
+
+<p>
+The Cool programming language is formally specified and defined in 
+<b><i>The Cool Reference Manual</i></b>, a
+document that you will grow to love (or hate) over the course of this
+semester. Multiple versions are available:
+
+</p> 
+  <ul>
+
+  <li> <a href="crm/">CRM Modern</a>  &mdash; 
+  a revised manual with improved readability, but requiring browser
+  JavaScript
+
+  <li> <a href="crm/One Page.html">CRM Modern (One Page, HTML)</a>  &mdash; 
+  a revised manual with improved readability, but requiring browser
+  JavaScript (one single webpage)
+
+  <li> 
+  <a href="https://web.eecs.umich.edu/~weimerw/2016-ldi/cool-manual/cool-manual.html">CRM Classic</a> &mdash; 
+  the "old-school" manual, requiring only basic HTML and images
+  </ul> 
+
+<!--
+<div class="panel panel-warning">
+<div class="panel-body">
+Your submissions will be judged based on the material in the "Classic"
+version of the CRM. While every effort has been made to make the "Modern"
+version identical, some transcription errors may occur. The course staff
+may not have the time to continuously update the "Modern" CRM as typos
+are discovered. 
+</div>
+</div>
+-->
+
+<h1>Cool Reference Compiler</h1>
+
+<p>
+Different versions of the reference interpreter are available for different
+platforms. Information on running the
+interpreter is available in the reference manual.
+</p> 
+
+<ul>
+  <li> <a href="cool/linux-x86/cool">Linux/x86</a> (v 1.36) 
+  <li> <a href="cool/linux-x86_64/cool">Linux/x86 (64 bit)</a>  (v 1.36)
+       (1.36 binaries with alternate library requirements: 
+       <a href="cool/linux-x86_64/cool-136b">B</a>  
+       <a href="cool/linux-x86_64/cool-136c">C</a> 
+       <a href="cool/linux-x86_64/cool-136d">D</a>) 
+  <li> <a href="cool/osx-x86/cool">OSX/x86</a> (v 1.36)
+  <!--
+       (1.34 binaries with alternate library requirements: 
+       <a href="cool/osx-x86_64/cool-134b">B</a>) 
+       --> 
+  <li> <a href="cool/win32-x86/cool.exe">Win32/x86</a> (v 1.36) 
+
+  <p>
+  <li> Unix/OSX Reminder: <tt> $ chmod a+x ./cool </tt> 
+  <!--
+  <li> <a href="cool/solaris-sun4u/cool">Solaris/UltraSPARC</a> (v 1.18)
+  <li> <a href="cool/win32-x86/cool-114.exe">Win32/x86</a> (v 1.14 &mdash; old) 
+  -->
+</ul>
+
+<ul>
+<li> <a href="cool/cool-examples.zip">cool-examples.zip</a> &mdash; Cool testcases and examples</a> 
+</ul>
+
+<h1>Cool Interactive In-Browser Debugger</h1>
+
+<p>
+<a href="http://dijkstra.eecs.umich.edu/ldi/ldi-debugger/">An interactive
+in-browser debugger for Cool is available.</a> This debugger allows you to
+load and save Cool programs (and inputs to Cool programs), set breakpoints,
+inspect the values of local variables, inspect stack traces, and otherwise
+explore Cool execution. 
+</p> 
+<ul>
+  <li> <a href="http://dijkstra.eecs.umich.edu/ldi/ldi-debugger/">Cool
+  Debugger</a> 
+  <li> <a
+  href="http://dijkstra.eecs.umich.edu/ldi/ldi-debugger/manual.html">Cool
+  Debugger Reference Manual</a> 
+</ul> 
+<P>
+Special thanks to alumni Chris Earman and Zane Mayberry for providing this
+debugger. Any attempt to reverse engineer the Cool Debugger is an Honor violation.
+(This is different from the reference compiler, which
+you are quite welcome to try to take apart.) 
+</p> 
+
+<h1>Additional Support</h1> 
+
+<p>
+There is <a
+href="http://www.vim.org/scripts/script.php?script_id=1216">Cool syntax
+highlighting support for Vim</a>. 
+</p> 
+
+<p>
+If you like XEmacs, the <a
+href="http://harmonia.cs.berkeley.edu/harmonia/projects/harmonia-mode/doc/index.html">Berkeley
+Harmonia project has a Cool mode</a>. It offers quite a bit more than
+syntax highlighting, but not all of the semantic features are guaranteed to
+be compatible with our dialect of Cool. 
+</p> 
+
+<p>
+The Sublime text editor supports <a
+href="https://github.com/princjef/sublime-cool-highlighter">Cool syntax highlighting</a>. 
+</p> 
+
+<p>
+The <a href="https://atom.io/">Atom</a> text editor has a student-written 
+<a href="https://github.com/princjef/atom-language-cool">Cool language
+syntax highlighter</a>. 
+</p> 
+
+<P>
+An easy-to-script <a href="http://delta.stage.tigris.org/">implementation
+of Delta Debugging</a> is available, written
+by Daniel S. Wilkerson and Scott McPeak. 
+<a href="https://web.eecs.umich.edu/~weimerw/2016-ldi/reading/delta-2006.08.03.tar.gz">(mirror)</a> 
+
+</div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+</body> 
+</html>
+
