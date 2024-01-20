@@ -1,0 +1,84 @@
+\documentclass[12pt]{article} \usepackage{color} \usepackage{amsmath} \usepackage{amssymb}
+\usepackage{graphicx} \usepackage{times} \usepackage{listings}
+
+\usepackage[total={5.7in,8.89in},bindingoffset=0.01in,top=1.25in,
+left=1.4in, includefoot]{geometry}
+\usepackage[dvips,color,line,arrow,graph,frame,matrix]{xy}
+
+\definecolor{listingbg}{rgb}{0.98,0.98,0.98}
+\lstset{ basicstyle=\ttfamily, backgroundcolor=\color{listingbg},
+         frame=tb }
+
+\begin{document}
+\begin{center}
+{\large Review Set 6} 
+\end{center}
+
+This Review Set asks you to prepare written answers to questions on
+local and global optimizations. Each of the questions has a short
+answer. You may discuss this Review Set with other students and work
+on the problems together. 
+
+\begin{enumerate}
+\item{ Consider the rules for the constant propagation algorithm discussed in class:
+\begin{equation*}
+\begin{array}{cl}
+(1) & C_{in}(x, s) = \#{} \quad \Rightarrow \quad C_{out}(x, s) = \#{} \\
+(2) & C_{in}(x, x \leftarrow c) \quad \Rightarrow \quad C_{out}(x, x \leftarrow c) = c \quad (c \text{ is a constant})\\
+(3) & C_{out}(x, x \leftarrow f(\ldots)) = * \\
+(4) & E(x) \neq E(y) \quad \Rightarrow \quad C_{out}(x, y \leftarrow \ldots) = C_{in}(x, y \leftarrow \ldots) \\
+(5) & C_{in}(x,s) = lub \{ C_{out}(x, p) \ | \ p \text{ is a predecessor of } s \}
+\end{array}
+\end{equation*}
+
+Note that these rules are not necessarily applied in order---the
+numbers are just there for ease of referencing. See the
+``Dataflow Analysis, Global Optimizations'' lecture notes for the actual steps
+of the algorithm.
+
+\begin{enumerate}
+\item Give a concise English description for each of rules 1--4.
+\item Note that rules 1--4 define $C_{out}$ in terms of $C_{in}$. Rule 5,
+on the other hand, defines $C_{in}$ based on the $C_{out}$ values of
+all predecessor statements. Give two distinct examples that show some set of
+predecessor $C_{out}$'s and the resulting $C_{in}$ computation.
+\item Briefly explain why the algorithm (as described in the lecture notes) is
+guaranteed to terminate.
+\item Note that, in rule 4, we set $y \leftarrow \ldots$ (where
+``$\ldots$'' is some expression $e$). Why is it safe to assume that the
+evaluation of $e$ does not change the value of $x$?
+\end{enumerate}
+}
+
+\newpage  
+
+\item Consider the following fragment of intermediate code:
+\begin{lstlisting}
+    START
+    if a = 2 goto L3
+L0: b := 2
+L1: d := a / 2
+    c := a % b
+    if c = 0 goto L2
+    if b >= d goto L3
+    b := b + 1
+    goto L1
+L2: a := a + 1
+    goto L0
+L3: END
+
+\end{lstlisting}
+\begin{enumerate}
+\item Divide this code into basic blocks; there should be at least
+6. Assume that \texttt{START} and \texttt{END} are placeholder
+instructions (i.e. they don't do anything).
+\item Draw a control-flow graph for this program, using your answer to
+(a). Place each basic block in a single node.
+\item Annotate your control-flow graph with the set of variables that
+are live before and after each statement. {\bf Assume that only
+\texttt{a} is live at the entry to \texttt{L3}}.
+\item Describe concisely what this program does if the value of
+  \texttt{a} is the only output.
+ \end{enumerate}
+\end{enumerate}
+\end{document} 

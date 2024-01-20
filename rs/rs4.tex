@@ -1,0 +1,197 @@
+\documentclass[12pt]{article} 
+\usepackage{color} 
+\usepackage{amsmath} 
+\usepackage{amssymb}
+\usepackage{graphicx} 
+\usepackage{times} 
+\usepackage{listings}
+\usepackage{proof} 
+
+\usepackage[total={5.7in,8.89in},bindingoffset=0.01in,top=1.25in,
+left=1.4in, includefoot]{geometry}
+\usepackage[dvips,color,line,arrow,graph,frame,matrix]{xy}
+
+\definecolor{listingbg}{rgb}{0.98,0.98,0.98}
+\lstset{ basicstyle=\ttfamily, backgroundcolor=\color{listingbg},
+         frame=tb }
+
+\begin{document}
+
+\begin{center}
+{\large Review Set 4} 
+\end{center}
+
+This Review Set asks you to prepare written answers to questions on
+type checking. Each of the questions has a short answer. You may
+discuss this Review Set with other students and work on the problems
+together. 
+
+\begin{enumerate}
+
+\item{{C++}, unlike COOL, supports multiple inheritance. For example,
+  the following class hierarchy is legal in C++:
+
+\begin{lstlisting}
+              A
+             / \
+            B   C
+             \ /
+              D
+\end{lstlisting}
+
+Allowing multiple inheritance changes the way we define and use the
+least upper bound (\emph{lub}) function on types.
+\begin{enumerate}
+\item{Explain, using at least one example, why it is necessary to
+  change \emph{lub}.}
+\item{Describe how you might implement \emph{lub} for multiple
+  inheritance. Be brief.}
+\end{enumerate}
+}
+\item{ The Java programming language includes arrays.  The Java
+language specification states that if $s$ is an array of elements of
+class $S$, and $t$ is an array of elements of class $T$, then the
+assignment $s = t$ is allowed as long as $T$ is a subclass of $S$.
+\\
+
+This typing rule for array assignments turns out to be unsound. Java
+works around this by inserting runtime checks to throw an exception if
+arrays are used unsafely.
+\\
+
+Consider the following Java program, which type checks according
+to the preceeding rule:
+
+\begin{lstlisting}[caption=totally innocuous Java code]
+class Mammal { String name; }
+
+class Dog extends Mammal {
+  void beginBarking() { ... }
+}
+
+class Main {
+  public static void main(String argv[]) {
+    Dog x[] = new Dog[5];
+    Mammal y[] = x;
+
+    // Insert your code here
+  }
+}
+\end{lstlisting}
+
+Add code to the \texttt{main} method so that the resulting program is
+a valid Java program (i.e., it compiles), but running that program
+triggers one of the aforementioned runtime checks. Include a brief
+explanation of how your program exhibits the problem.
+}
+\item{The following typing judgments have one or more flaws. For each
+  judgment, list the flaws and explain how they affect the judgment.
+\begin{enumerate}
+
+\item
+$$
+\infer[(let-init)]
+{ O[ x / T_0 ] \vdash \text{let} \ x : T_0 \leftarrow e_0 \ \text{in}
+  \ e_1 : T_1}
+{ \begin{array}{c} 
+O   \vdash e_0 : T \\
+O   \vdash T \leq T_0 \\
+O   \vdash e_1 : T_1
+  \end{array}
+}
+$$
+
+\item
+$$
+\infer[(assign)]
+  { O \vdash \mathrm{id} \leftarrow e_1 : T_1 }
+  { \begin{array}{c}
+    O(\mathrm{id}) = T_0 \\
+    O \vdash e_1 : T_1 \\
+    T_0 \leq T_1
+    \end{array} 
+  } 
+$$
+
+\item
+$$
+\infer[(self-type)]
+{ \vdash \mathrm{SELF\_TYPE}_C \leq T }
+{ T \leq C } 
+$$
+
+\item
+$$
+\infer[(static-dispatch-self)]
+{ O,M,C \vdash e_0 @ T . f ( e_1, \dots, e_n) : T_{n+1}' }
+{ \begin{array}{c}
+  O,M,C \vdash e_0 : T_0 \\
+  \dots \\
+  O,M,C \vdash e_n : T_n \\
+  T_0 \leq T \\
+  M(T_0,f) = ( T_1', \dots, T_n', T_{n+1}' ) \\
+  T_{n+1}' \neq \mathrm{SELF\_TYPE} \\
+  \forall 1 \leq i \leq n ~.~ T_i \leq T_i' 
+  \end{array} 
+} 
+$$
+
+
+
+
+% \item{
+% \begin{equation*}
+% \cfrac{
+% \begin{aligned}
+% W & \vdash P \langle T \rangle : type \\
+% O, M, W & \vdash e_0 : P \langle T \rangle \\
+% O, M, W & \vdash e_1 : T_1 \\
+% \vdots & \\
+% O, M, W & \vdash e_n : T_n \\
+% M(P \langle x \rangle, f) & = (T'_1 \dots T'_n, T'_{n + 1}) \\
+% T_i & \leq T'_i[x/T] \quad 1 \leq i \leq n
+% \end{aligned}
+% }
+% {
+% O, M, W \vdash {e_0}.f(e_1, \dots e_n) : T'_{n + 1}
+% }\quad \text{[dispatch-template]}
+% \end{equation*}
+% Where $T_0[q/T_1]$ reads as `replace each occurrence of the name
+%   $q$ with type expression $T_1$ in type expression $T_0$. ' In class
+%   it was written as $T''_0$.
+% }
+
+
+
+\end{enumerate}
+}
+
+
+% \item{Recall the `is a valid type' rules we used to type check
+%   COOL-with-templates:
+
+% \begin{equation*}
+% \begin{array}{ccc}
+% \cfrac{}{W \vdash C : type} & \cfrac{}{W = P \langle t \rangle \vdash t : type} & \cfrac{W \vdash T : Type}{W \vdash P \langle T \rangle : Type}
+% \end{array}
+% \end{equation*}
+
+% Use these three rules to construct a derivation for the following
+%   COOL-with-templates code. (For an example derivation tree, see slide
+%   44 in the `Scoping \and Types' lecture notes.)
+
+% \begin{lstlisting}[caption = COOL-with-templates]
+% class List<T> {
+%   (* ... *)
+% };
+
+% class Person {
+%   (* ... *)
+% };
+
+% (* Give the derivation for the type of x: *)
+% let x : List<List<Person> > <- ...
+% \end{lstlisting}
+% }
+\end{enumerate}
+\end{document}

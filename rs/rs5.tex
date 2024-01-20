@@ -1,0 +1,180 @@
+\documentclass[12pt]{article} \usepackage{color} \usepackage{amsmath} \usepackage{amssymb}
+\usepackage{graphicx} \usepackage{times} \usepackage{listings}
+
+\usepackage[total={5.7in,8.89in},bindingoffset=0.01in,top=1.25in,
+left=1.4in, includefoot]{geometry}
+\usepackage[dvips,color,line,arrow,graph,frame,matrix]{xy}
+
+\definecolor{listingbg}{rgb}{0.98,0.98,0.98}
+\lstset{ basicstyle=\ttfamily, backgroundcolor=\color{listingbg},
+         frame=tb }
+
+
+\begin{document}
+
+\begin{center}
+{\large Review Set 5} 
+\end{center}
+
+
+This Review Set asks you to prepare written answers to questions on
+runtime organization and operational semantics. Each of the questions has a
+short answer. You may discuss this Review Set with other students and
+work on the problems together. 
+
+\begin{enumerate}
+\item{Consider the following piece of code:
+\begin{lstlisting}
+fact(n : Int) : Int {
+ if n > 0 then n*fact(n-1) else 1 fi
+};
+\end{lstlisting}
+Draw the tree of activation records for a call to \texttt{fact(4)}. Include
+at least the stack pointers, frame pointers, return values, and parameters. 
+}
+\item{
+Consider these six operational semantics rules:
+\begin{equation*}
+\small
+\begin{array}{cc}
+(1) \ \cfrac{
+\begin{aligned}
+\\
+\\
+so, E, S \vdash e_1 : Bool(false), S_1
+\end{aligned}
+}
+{so, E, S \vdash \text{while }e_1\text{ loop } e_2 \text{ pool } : void, S_1} 
+&
+(4) \ \cfrac{
+\begin{aligned}
+E(id) &= l_{id} \\
+S(l_{id}) &= v
+\end{aligned}
+}{so, E, S \vdash id : v, S}
+\\
+\\
+(2) \ \cfrac{
+\begin{aligned}
+so, E, S & \vdash e_1 : Bool(true), S_1 \\
+so, E, S_1 & \vdash e_2 : v, S_2 \\
+so, e, S_2 & \vdash \text{while } e_1 \text{ loop } e_2 \text{ pool } : void, S_3
+\end{aligned}
+}
+{so, E, S \vdash \text{while }e_1\text{ loop } e_2 \text{ pool } : void, S_3} 
+& 
+(5) \ 
+\cfrac{
+\begin{aligned}
+so, E, S & \vdash e : v, S_1 \\
+E(id) &= l_{id} \\
+S_2 & = S_1[v/l_{id}]
+\end{aligned}
+}
+{so, E, S \vdash id \leftarrow e : v, S_2}
+
+\\
+\\
+(3) \ \cfrac{
+\begin{array}{c}
+\begin{aligned}
+so, E, S & \vdash e_1 : v_1, S_1 \\
+l_{new} &= newloc(S_1)
+\end{aligned}\\
+so, E[l_{new}/id], S_1[v_1/l_{new}] \vdash e_2 : v_2, S_2
+\end{array}
+}{so, E, S \vdash \text{let } id : T \leftarrow e_1 \text{ in } e_2 : v_2, S_2}
+\end{array}
+\end{equation*}
+
+\begin{equation*}
+\small
+(6) \ \cfrac{
+\begin{array}{c}
+\begin{aligned}
+so, E, S & \vdash e_1 : Int(n_1), S_1 \\
+so, E, S_1 & \vdash e_2 : Int(n_2), S_2 \\
+\end{aligned}\\
+v  = \begin{cases}
+Bool(true) \quad & \text{if }n_1 < n_2\\
+Bool(false) \quad & \text{if }n_1 \geq n_2
+\end{cases} 
+\end{array}}
+{so, E, S \vdash e_1 < e_2 : v, S_2}
+\end{equation*}
+Use these rules to construct a derivation for the following piece of
+code:
+\begin{lstlisting}
+let x : Int <- 2 in
+while 1 < x loop
+ x <- x - 1
+pool
+\end{lstlisting}
+
+You may assume reasonable axioms, e.g. it is always true that $so, E,
+S \vdash 2 - 1 : Int(1), S$. Start your derivation using the
+\texttt{let} rule (3) as follows:
+{\scriptsize
+\begin{equation*}
+\cfrac{
+\cfrac{}{so, E, S \vdash 2 : Int(2), S} \quad \quad \cfrac{\ldots}
+{so, E[l_{new}/x], S[Int(2)/l_{new}] \vdash \text{while } 1 < x \text{ loop } x \leftarrow x - 1 \text{ pool }: void, S_{final}} (2)}{so, E, S \vdash \text{let } x : Int \leftarrow 2 \text{ in while } 1 < x \text{ loop } x \leftarrow x - 1 \text{ pool } : void, S_{final}} (3)
+\end{equation*}
+}
+Note that you only need to expand hypotheses that need to be proved (i.e. those containing $\vdash$).
+}
+\item{ Suppose we wanted to add arrays to Cool, using the following
+syntax:
+\begin{center}
+\begin{tabular}{ll}
+\texttt{let a:T[$e_1$] in $e_2$} &
+  Create an array $a$ with size $e_1$ of $T$s, usable in $e_2$ \\
+\texttt{a[$e_1$] <- $e_2$} &
+  Assign $e_2$ to element $e_1$ in $a$ \\
+\texttt{a[e]} &
+  Get element $e$ of $a$
+\end{tabular}
+\end{center}
+
+Write the operational semantics for these three syntactic constructs. You
+may find it helpful to think of an array of type $T[n]$ as an object with
+$n$ attributes of type $T$. 
+}
+
+\item{
+
+The operational semantics for Cool's {\tt while} expression show that
+result of evaluating such an expression is always {\tt void}.
+
+However, we could have used the following alternative semantics:
+
+\begin{itemize}
+
+\item{If the loop body executes at least once, the result of the {\tt
+while} expression is the result from the \emph{last} iteration of the
+loop body.}
+
+\item{If the loop body never executes (i.e., the condition is false the
+first time it is evaluated), then the result of the {\tt while} expression
+is {\tt void}.}
+
+\end{itemize}
+
+For example, consider the following expression:
+
+\begin{lstlisting}
+while (x < 10) loop x <- x+1 pool
+\end{lstlisting}
+
+The result of this expression would be 10 if, initially, {\tt x} $<$
+10 or {\tt void} if {\tt x} $\geq$ 10.
+
+Write new operational rules for the {\tt while} construct that
+formalize these alternative semantics.
+}
+
+
+% ---------------------
+
+\end{enumerate}
+\end{document}

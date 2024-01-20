@@ -1,0 +1,107 @@
+\documentclass[12pt]{article} \usepackage{color} \usepackage{amsmath} \usepackage{amssymb}
+\usepackage{graphicx} \usepackage{times} \usepackage{listings}
+
+\usepackage[total={5.7in,8.89in},bindingoffset=0.01in,top=1.25in,
+left=1.4in, includefoot]{geometry}
+\usepackage[dvips,color,line,arrow,graph,frame,matrix]{xy}
+
+\definecolor{listingbg}{rgb}{0.98,0.98,0.98}
+\lstset{ basicstyle=\ttfamily, backgroundcolor=\color{listingbg},
+         frame=tb }
+
+\begin{document}
+
+\begin{center}
+{\large Review Set 7} 
+\end{center}
+
+This Review Set asks you to prepare written answers to questions on
+garbage collection and exceptions. Each of the questions has
+a short answer. You may discuss this Review Set with other students
+and work on the problems together. However, your write-up should be
+your own individual work.
+
+\begin{enumerate}
+\item{Consider \emph{Stop \&{} Copy} vs. \emph{Mark \&{} Sweep} garbage collection.
+\begin{enumerate}
+\item{Assume that the garbage collector is run only when the user
+program runs out of memory, i.e. when a call to \texttt{new} cannot be
+satisfied. Is one of these two GC algorithms `faster' than the other?
+Which algorithm needs to be run more frequently?}
+\item{Does either algorithm use strictly more memory than the other? \\}
+\end{enumerate}
+
+
+Python uses reference counting for its garbage collector. It uses a
+special `cycle detector' to clean up cyclical data structures
+periodically.
+\begin{enumerate}
+\setcounter{enumii}{2}
+\item{Are reference cycles common in everday data structures?}
+\item{Briefly describe how one might implement a cycle detector. When
+can a cycle be cleaned?}
+\end{enumerate}
+}
+
+\item{ Imagine that we have an updated version of Cool that supports
+\texttt{try}, \texttt{catch} and \texttt{throw} (as in the `Exceptions
+and Error Handling' lecture notes). Suppose further that we want to
+add a new construct to the language: \texttt{protect } $e$, which
+works as follows:
+
+\begin{itemize}
+\item{At compile time, the type checker verifies that the expression
+$e$ does not have any uncaught exceptions. In other words, $e$ can
+contain \texttt{throw} clauses, but they must all be caught using a
+\texttt{try} / \texttt{catch} construct. If $e$ does not meet this
+requirement, the compiler should reject the program.}
+\item{At runtime, \texttt{protect } $e$ simply evaluates to
+$e$. Another way to look at this is that the \texttt{protect} keyword
+is ignored at runtime.}
+\end{itemize}
+
+In order to check \texttt{protect} expressions at compile time, we
+need to extend our typing judgments to track a boolean $E$ indicating
+whether an exception can be thrown out of the expression:
+
+$$
+O,M,C \vdash e : T, E
+$$
+
+For example, the extended rule for $+$ would be:
+
+$$
+\cfrac{
+\begin{aligned}
+O,M,C & \vdash e_1 : Int, E_1 \\
+O,M,C & \vdash e_2 : Int, E_2
+\end{aligned}}
+{O,M,C \vdash e_1 + e_2 : Int , E_1 \vee E_2 }
+\quad \text{[Plus]}
+$$
+
+\begin{enumerate}
+\item{\emph{Assume that a \texttt{try} / \texttt{catch} block catches all
+exceptions (i.e. the exception type being caught is always
+\texttt{Object}).}
+\\
+
+Give the new type rules for \texttt{protect}, \texttt{try} /
+\texttt{catch}, and \texttt{throw}. For example, the rule for
+\texttt{try} / \texttt{catch} should look similar to this:
+$$
+\cfrac{
+\ldots
+}
+{O, M, C \vdash \text{try} \ e_0 \ \text{catch} \ x : \text{Object} \  \Rightarrow \ e_1 : T_0 \sqcup T_1, E'}
+$$
+ }
+\item{The typing system described here is not necessarily safe. Give a
+code sample that illustrates this. Your code should pass the type
+checker, but still manage to throw an exception out of a
+\texttt{protect} statement. Briefly explain how your code manages to
+fool the type checker.}
+\end{enumerate}
+}
+\end{enumerate}
+\end{document} 
