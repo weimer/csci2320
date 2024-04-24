@@ -389,7 +389,7 @@ You must turn in these files:
 <h1>Language-Specific Hints</h1>
 
 <p>
-Python hint:
+Python hint #1:
 </p> 
 
 <blockquote>
@@ -416,6 +416,23 @@ to the top of his Python source, which makes the division operator always
 return a floating-point result. That result can then be cast to an integer
 via the <tt>int()</tt> constructor.
 </p> 
+
+   <p>
+Python hint #2:
+</p> 
+
+<blockquote>
+<p>
+If you are programming PA5 in Python and are unable to pass test cases that have lots of nested expressions, it may be because Python's default max recursion depth is set to 1000 which stops your program from reading/evaluating them fully. 
+   To surpass this, you can write <tt>sys.<a href="https://docs.python.org/3/library/sys.html#sys.setrecursionlimit">setrecursionlimit(10000)</a></tt> in your main() function.  
+  </p>
+   
+<small>
+anonymous Bowdoin student(s)
+</small> 
+</blockquote>
+
+
 
 <h1>Grading Rubric</h1>
 
